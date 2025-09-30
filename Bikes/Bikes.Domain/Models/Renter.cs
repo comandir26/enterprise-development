@@ -1,8 +1,12 @@
 ﻿namespace Bikes.Domain.Models;
+
+/// <summary>
+/// A class describing a renter
+/// </summary>
 public class Renter
 {
     /// <summary>
-    /// The unique id for the renter
+    /// Renter's unique id
     /// </summary>
     public required int Id { get; set; }
     /// <summary>
