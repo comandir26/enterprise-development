@@ -1,5 +1,4 @@
 ﻿namespace Bikes.Domain.Models;
-
 /// <summary>
 /// A class describing a bike's model
 /// </summary>
