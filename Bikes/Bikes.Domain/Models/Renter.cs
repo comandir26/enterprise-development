@@ -9,10 +9,12 @@ public class Renter
     /// Renter's unique id
     /// </summary>
     public required int Id { get; set; }
+
     /// <summary>
     /// Renter's full name
     /// </summary>
     public required string FullName { get; set; }
+
     /// <summary>
     /// Renter's phone number
     /// </summary>

@@ -9,18 +9,22 @@ public class Rent
     /// Rent's unique id
     /// </summary>
     public required int Id { get; set; }
+
     /// <summary>
     /// Rental start time
     /// </summary>
     public required DateTime RentalStartTime { get; set; }
+
     /// <summary>
     /// Rental duration
     /// </summary>
     public required int RentalDuration { get; set; }
+
     /// <summary>
     /// Renter
     /// </summary>
     public required Renter Renter { get; set; }
+
     /// <summary>
     /// Bike
     /// </summary>

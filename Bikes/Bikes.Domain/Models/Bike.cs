@@ -9,14 +9,17 @@ public class Bike
     /// Bike's unique id
     /// </summary>
     public required int Id { get; set; }
+
     /// <summary>
     /// Bike's serial number
     /// </summary>
     public required string SerialNumber { get; set; }
+
     /// <summary>
     /// Bike's color
     /// </summary>
     public required string Color { get; set; }
+
     /// <summary>
     /// Bike's model
     /// </summary>
