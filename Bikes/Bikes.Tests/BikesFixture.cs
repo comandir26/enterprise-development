@@ -5,7 +5,7 @@ namespace Bikes.Tests;
 public class BikesFixture
 {
 
-    public List<BikeModel> BikeModels =>
+    public List<BikeModel> BikeModels =
         [
             new() { Id = 1, Type = BikeType.Mountain, WheelSize = 29, MaxPassengerWeight = 120, Weight = 14, BrakeType = "Дисковые гидравлические", Year = "2023", RentPrice = 700 },
             new() { Id = 2, Type = BikeType.Sport, WheelSize = 27, MaxPassengerWeight = 110, Weight = 11, BrakeType = "Ободные v-brake", Year = "2024", RentPrice = 850 },
@@ -50,24 +50,24 @@ public class BikesFixture
     public List<Rent> Rents =>
         [
             new() { Id = 1, RentalStartTime = new DateTime(2025, 6, 10, 9, 0, 0), RentalDuration = 3, Renter = Renters[0], Bike = Bikes[0] },
-            new() { Id = 2, RentalStartTime = new DateTime(2025, 6, 12, 14, 30, 0), RentalDuration = 2, Renter = Renters[1], Bike = Bikes[1] },
-            new() { Id = 3, RentalStartTime = new DateTime(2025, 6, 15, 10, 0, 0), RentalDuration = 4, Renter = Renters[2], Bike = Bikes[2] },
-            new() { Id = 4, RentalStartTime = new DateTime(2025, 6, 18, 16, 0, 0), RentalDuration = 1, Renter = Renters[3], Bike = Bikes[3] },
-            new() { Id = 5, RentalStartTime = new DateTime(2025, 6, 20, 11, 0, 0), RentalDuration = 5, Renter = Renters[4], Bike = Bikes[4] },
-            new() { Id = 6, RentalStartTime = new DateTime(2025, 6, 22, 13, 0, 0), RentalDuration = 2, Renter = Renters[5], Bike = Bikes[5] },
-            new() { Id = 7, RentalStartTime = new DateTime(2025, 6, 25, 15, 30, 0), RentalDuration = 3, Renter = Renters[6], Bike = Bikes[6] },
-            new() { Id = 8, RentalStartTime = new DateTime(2025, 6, 28, 9, 30, 0), RentalDuration = 4, Renter = Renters[7], Bike = Bikes[7] },
-            new() { Id = 9, RentalStartTime = new DateTime(2025, 7, 1, 12, 0, 0), RentalDuration = 1, Renter = Renters[8], Bike = Bikes[8] },
-            new() { Id = 10, RentalStartTime = new DateTime(2025, 7, 3, 17, 0, 0), RentalDuration = 2, Renter = Renters[9], Bike = Bikes[9] },
-            new() { Id = 11, RentalStartTime = new DateTime(2025, 7, 5, 10, 0, 0), RentalDuration = 3, Renter = Renters[0], Bike = Bikes[1] },
-            new() { Id = 12, RentalStartTime = new DateTime(2025, 7, 8, 14, 0, 0), RentalDuration = 5, Renter = Renters[1], Bike = Bikes[2] },
-            new() { Id = 13, RentalStartTime = new DateTime(2025, 7, 10, 16, 30, 0), RentalDuration = 2, Renter = Renters[2], Bike = Bikes[3] },
-            new() { Id = 14, RentalStartTime = new DateTime(2025, 7, 12, 11, 0, 0), RentalDuration = 4, Renter = Renters[3], Bike = Bikes[4] },
-            new() { Id = 15, RentalStartTime = new DateTime(2025, 7, 15, 13, 0, 0), RentalDuration = 1, Renter = Renters[4], Bike = Bikes[5] },
-            new() { Id = 16, RentalStartTime = new DateTime(2025, 7, 18, 15, 0, 0), RentalDuration = 3, Renter = Renters[5], Bike = Bikes[6] },
-            new() { Id = 17, RentalStartTime = new DateTime(2025, 7, 20, 9, 0, 0), RentalDuration = 2, Renter = Renters[6], Bike = Bikes[7] },
-            new() { Id = 18, RentalStartTime = new DateTime(2025, 7, 22, 12, 30, 0), RentalDuration = 5, Renter = Renters[7], Bike = Bikes[8] },
-            new() { Id = 19, RentalStartTime = new DateTime(2025, 7, 25, 14, 0, 0), RentalDuration = 3, Renter = Renters[8], Bike = Bikes[9] },
-            new() { Id = 20, RentalStartTime = new DateTime(2025, 7, 28, 16, 0, 0), RentalDuration = 4, Renter = Renters[9], Bike = Bikes[0] }
+            new() { Id = 2, RentalStartTime = new DateTime(2025, 6, 12, 14, 30, 0), RentalDuration = 2, Renter = Renters[1], Bike = Bikes[0] },
+            new() { Id = 3, RentalStartTime = new DateTime(2025, 6, 15, 10, 0, 0), RentalDuration = 4, Renter = Renters[2], Bike = Bikes[0] },
+            new() { Id = 4, RentalStartTime = new DateTime(2025, 6, 18, 16, 0, 0), RentalDuration = 1, Renter = Renters[3], Bike = Bikes[1] },
+            new() { Id = 5, RentalStartTime = new DateTime(2025, 6, 20, 11, 0, 0), RentalDuration = 5, Renter = Renters[4], Bike = Bikes[1] },
+            new() { Id = 6, RentalStartTime = new DateTime(2025, 6, 22, 13, 0, 0), RentalDuration = 2, Renter = Renters[5], Bike = Bikes[1] },
+            new() { Id = 7, RentalStartTime = new DateTime(2025, 6, 25, 15, 30, 0), RentalDuration = 3, Renter = Renters[6], Bike = Bikes[2] },
+            new() { Id = 8, RentalStartTime = new DateTime(2025, 6, 28, 9, 30, 0), RentalDuration = 4, Renter = Renters[7], Bike = Bikes[2] },
+            new() { Id = 9, RentalStartTime = new DateTime(2025, 7, 1, 12, 0, 0), RentalDuration = 1, Renter = Renters[8], Bike = Bikes[3] },
+            new() { Id = 10, RentalStartTime = new DateTime(2025, 7, 3, 17, 0, 0), RentalDuration = 2, Renter = Renters[9], Bike = Bikes[3] },
+            new() { Id = 11, RentalStartTime = new DateTime(2025, 7, 5, 10, 0, 0), RentalDuration = 3, Renter = Renters[0], Bike = Bikes[4] },
+            new() { Id = 12, RentalStartTime = new DateTime(2025, 7, 8, 14, 0, 0), RentalDuration = 5, Renter = Renters[0], Bike = Bikes[4] },
+            new() { Id = 13, RentalStartTime = new DateTime(2025, 7, 10, 16, 30, 0), RentalDuration = 2, Renter = Renters[0], Bike = Bikes[5] },
+            new() { Id = 14, RentalStartTime = new DateTime(2025, 7, 12, 11, 0, 0), RentalDuration = 4, Renter = Renters[0], Bike = Bikes[6] },
+            new() { Id = 15, RentalStartTime = new DateTime(2025, 7, 15, 13, 0, 0), RentalDuration = 1, Renter = Renters[1], Bike = Bikes[7] },
+            new() { Id = 16, RentalStartTime = new DateTime(2025, 7, 18, 15, 0, 0), RentalDuration = 3, Renter = Renters[1], Bike = Bikes[8] },
+            new() { Id = 17, RentalStartTime = new DateTime(2025, 7, 20, 9, 0, 0), RentalDuration = 2, Renter = Renters[1], Bike = Bikes[9] },
+            new() { Id = 18, RentalStartTime = new DateTime(2025, 7, 22, 12, 30, 0), RentalDuration = 5, Renter = Renters[5], Bike = Bikes[9] },
+            new() { Id = 19, RentalStartTime = new DateTime(2025, 7, 25, 14, 0, 0), RentalDuration = 3, Renter = Renters[5], Bike = Bikes[9] },
+            new() { Id = 20, RentalStartTime = new DateTime(2025, 7, 28, 16, 0, 0), RentalDuration = 4, Renter = Renters[2], Bike = Bikes[9] }
         ];
 }
