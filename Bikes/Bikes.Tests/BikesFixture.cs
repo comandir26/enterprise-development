@@ -2,10 +2,15 @@
 
 namespace Bikes.Tests;
 
+/// <summary>
+/// A class for creating the data needed for testing
+/// </summary>
 public class BikesFixture
 {
-
-    public List<BikeModel> BikeModels =
+    /// <summary>
+    /// List of bike models
+    /// </summary>
+    public List<BikeModel> BikeModels =>
         [
             new() { Id = 1, Type = BikeType.Mountain, WheelSize = 29, MaxPassengerWeight = 120, Weight = 14, BrakeType = "Дисковые гидравлические", Year = "2023", RentPrice = 700 },
             new() { Id = 2, Type = BikeType.Sport, WheelSize = 27, MaxPassengerWeight = 110, Weight = 11, BrakeType = "Ободные v-brake", Year = "2024", RentPrice = 850 },
@@ -19,6 +24,9 @@ public class BikesFixture
             new() { Id = 10, Type = BikeType.Mountain, WheelSize = 26, MaxPassengerWeight = 130, Weight = 14, BrakeType = "Дисковые гидравлические", Year = "2024", RentPrice = 650 }
         ];
 
+    /// <summary>
+    /// List of bikes
+    /// </summary>
     public List<Bike> Bikes =>
         [
             new() { Id = 1, SerialNumber = "MTB202301001", Color = "Черный", Model = BikeModels[0] },
@@ -33,6 +41,9 @@ public class BikesFixture
             new() { Id = 10, SerialNumber = "MTB202405001", Color = "Голубой", Model = BikeModels[9] }
         ];
 
+    /// <summary>
+    /// List of renters
+    /// </summary>
     public List<Renter> Renters =>
         [
             new() { Id = 1, FullName = "Иванов Иван Иванович", Number = "+7 (912) 345-67-89" },
@@ -47,6 +58,9 @@ public class BikesFixture
             new() { Id = 10, FullName = "Федоров Артем Константинович", Number = "+7 (901) 234-56-78" }
         ];
 
+    /// <summary>
+    /// List of rents
+    /// </summary>
     public List<Rent> Rents =>
         [
             new() { Id = 1, RentalStartTime = new DateTime(2025, 6, 10, 9, 0, 0), RentalDuration = 3, Renter = Renters[0], Bike = Bikes[0] },

@@ -1,47 +1,37 @@
 ﻿using Bikes.Domain.Models;
-using System.Collections.Generic;
-using System.Security.Cryptography.X509Certificates;
-using Xunit.Sdk;
 
 namespace Bikes.Tests;
 
+/// <summary>
+/// A class that implements a set of unit tests
+/// </summary>
 public class BikesTests(BikesFixture fixture) : IClassFixture<BikesFixture>
 {
+    /// <summary>
+    /// A test that outputs information about all sports bikes
+    /// </summary>
     [Fact]
     public void InformationAboutSportBikes()
     {
-        var expected = new List<Bike>
-        {
-            new() { Id = 2, SerialNumber = "SPT202402001", Color = "Красный", Model = fixture.BikeModels[1] },
-            new() { Id = 5, SerialNumber = "SPT202403001", Color = "Желтый", Model = fixture.BikeModels[4] },
-            new() { Id = 8, SerialNumber = "SPT202305001", Color = "Фиолетовый", Model = fixture.BikeModels[7] },
-        };
+        var expectedModelIds = new List<int> {2, 5, 8};
 
-        var actual = fixture.Bikes
+        var actualIds = fixture.Bikes
             .Where(bike => bike.Model.Type == BikeType.Sport)
             .Select(bike => bike.Id)
             .ToList();
 
-
-        for (var i = 0; i < expected.Count; i++)
-        {
-            Assert.Equal(expected[i].Id, actual[i]);
-        }
+        Assert.Equal(expectedModelIds, actualIds);
     }
 
+    /// <summary>
+    /// A test that outputs the top 5 bike models by rental duration
+    /// </summary>
     [Fact]
-    public void TopFiveModelsRentDuration()
+    public void TopFiveModelsRentDurationIds()
     {
-        var expected = new List<BikeModel>
-        {
-            new() { Id = 10, Type = BikeType.Mountain, WheelSize = 26, MaxPassengerWeight = 130, Weight = 14, BrakeType = "Дисковые гидравлические", Year = "2024", RentPrice = 650 },
-            new() { Id = 1, Type = BikeType.Mountain, WheelSize = 29, MaxPassengerWeight = 120, Weight = 14, BrakeType = "Дисковые гидравлические", Year = "2023", RentPrice = 700 },
-            new() { Id = 2, Type = BikeType.Sport, WheelSize = 27, MaxPassengerWeight = 110, Weight = 11, BrakeType = "Ободные v-brake", Year = "2024", RentPrice = 850 },
-            new() { Id = 5, Type = BikeType.Sport, WheelSize = 26, MaxPassengerWeight = 115, Weight = 12, BrakeType = "Ободные карбоновые", Year = "2024", RentPrice = 900 },
-            new() { Id = 3, Type = BikeType.City, WheelSize = 26, MaxPassengerWeight = 130, Weight = 16, BrakeType = "Дисковые механические", Year = "2022", RentPrice = 500 }
-        };
+        var expectedModelIds = new List<int> {10, 1, 2, 5, 3}; 
 
-        var actual = fixture.Rents
+        var actualIds = fixture.Rents
             .GroupBy(rent => rent.Bike.Model.Id)
             .Select(group => new
             {
@@ -54,25 +44,18 @@ public class BikesTests(BikesFixture fixture) : IClassFixture<BikesFixture>
             .Take(5)
             .ToList();
 
-        for (var i = 0; i < expected.Count; i++)
-        {
-            Assert.Equal(expected[i].Id, actual[i]);
-        }
+        Assert.Equal(expectedModelIds, actualIds);
     }
 
+    /// <summary>
+    /// A test that outputs the top 5 bike models in terms of rental income
+    /// </summary>
     [Fact]
     public void TopFiveModelsProfit()
     {
-        var expected = new List<BikeModel>
-        {
-            new() { Id = 10, Type = BikeType.Mountain, WheelSize = 26, MaxPassengerWeight = 130, Weight = 14, BrakeType = "Дисковые гидравлические", Year = "2024", RentPrice = 650 },
-            new() { Id = 5, Type = BikeType.Sport, WheelSize = 26, MaxPassengerWeight = 115, Weight = 12, BrakeType = "Ободные карбоновые", Year = "2024", RentPrice = 900 },
-            new() { Id = 2, Type = BikeType.Sport, WheelSize = 27, MaxPassengerWeight = 110, Weight = 11, BrakeType = "Ободные v-brake", Year = "2024", RentPrice = 850 },
-            new() { Id = 1, Type = BikeType.Mountain, WheelSize = 29, MaxPassengerWeight = 120, Weight = 14, BrakeType = "Дисковые гидравлические", Year = "2023", RentPrice = 700 },
-            new() { Id = 3, Type = BikeType.City, WheelSize = 26, MaxPassengerWeight = 130, Weight = 16, BrakeType = "Дисковые механические", Year = "2022", RentPrice = 500 }
-        };
+        var expectedModelIds = new List<int> {10, 5, 2, 1, 3};
 
-        var actual = fixture.Rents
+        var actualIds = fixture.Rents
             .GroupBy(rent => rent.Bike.Model.Id)
             .Select(group => new
             {
@@ -84,13 +67,12 @@ public class BikesTests(BikesFixture fixture) : IClassFixture<BikesFixture>
             .Select(x => x.Model.Id)
             .Take(5)
             .ToList();
-
-        for (var i = 0; i < expected.Count; i++)
-        {
-            Assert.Equal(expected[i].Id, actual[i]);
-        }
+        Assert.Equal(expectedModelIds, actualIds);
     }
 
+    /// <summary>
+    /// A test that outputs information about the minimum, maximum, and average bike rental time.
+    /// </summary>
     [Fact]
     public void MinMaxAvgRentalDuration()
     {
@@ -107,6 +89,9 @@ public class BikesTests(BikesFixture fixture) : IClassFixture<BikesFixture>
         Assert.Equal(expectedAvg, actualAvg);
     }
 
+    /// <summary>
+    /// A test that outputs the total rental time of each type of bike
+    /// </summary>
     [Fact]
     public void TotalRentalTimeByType() 
     {
@@ -133,17 +118,15 @@ public class BikesTests(BikesFixture fixture) : IClassFixture<BikesFixture>
         Assert.Equal(expectedCityRentaltime, actualCityRentaltime);
     }
 
+    /// <summary>
+    /// A test that outputs information about the customers who have rented bicycles the most times.
+    /// </summary>
     [Fact]
     public void TopThreeRenters()
     {
-        var expectedTopRenters = new List<Renter>
-        {
-            new() { Id = 1, FullName = "Иванов Иван Иванович", Number = "+7 (912) 345-67-89" },
-            new() { Id = 2, FullName = "Петров Петр Сергеевич", Number = "+7 (923) 456-78-90" },
-            new() { Id = 6, FullName = "Попов Денис Андреевич", Number = "+7 (967) 890-12-34" },
-        };
+        var expectedTopRentersIds = new List<int> {1, 2, 6};
 
-        var actualTopRenters = fixture.Rents
+        var actualTopRentersIds = fixture.Rents
             .GroupBy(rent => rent.Renter.Id)
             .Select(group => new
             {
@@ -156,9 +139,6 @@ public class BikesTests(BikesFixture fixture) : IClassFixture<BikesFixture>
             .Take(3)
             .ToList();
 
-        for (var i = 0; i < actualTopRenters.Count; i++)
-        {
-            Assert.Equal(expectedTopRenters[i].Id, actualTopRenters[i]);
-        }
+        Assert.Equal(expectedTopRentersIds, actualTopRentersIds);
     }
 }
