@@ -36,11 +36,10 @@ public class BikesTests(BikesFixture fixture) : IClassFixture<BikesFixture>
             .Select(group => new
             {
                 ModelId = group.Key,
-                Model = fixture.BikeModels.First(m => m.Id == group.Key),
                 TotalDuration = group.Sum(rent => rent.RentalDuration)
             })
             .OrderByDescending(x => x.TotalDuration)
-            .Select(x => x.Model.Id)
+            .Select(x => x.ModelId)
             .Take(5)
             .ToList();
 
@@ -60,11 +59,10 @@ public class BikesTests(BikesFixture fixture) : IClassFixture<BikesFixture>
             .Select(group => new
             {
                 ModelId = group.Key,
-                Model = fixture.BikeModels.First(m => m.Id == group.Key),
                 TotalProfit = group.Sum(rent => rent.RentalDuration * rent.Bike.Model.RentPrice)
             })
             .OrderByDescending(x => x.TotalProfit)
-            .Select(x => x.Model.Id)
+            .Select(x => x.ModelId)
             .Take(5)
             .ToList();
         Assert.Equal(expectedModelIds, actualIds);
@@ -80,9 +78,10 @@ public class BikesTests(BikesFixture fixture) : IClassFixture<BikesFixture>
         const int expectedMax = 5;
         const double expectedAvg = 2.95;
 
-        var actualMin = fixture.Rents.Min(rent => rent.RentalDuration);
-        var actualMax = fixture.Rents.Max(rent => rent.RentalDuration);
-        var actualAvg = fixture.Rents.Average(rent => rent.RentalDuration);
+        var durations = fixture.Rents.Select(rent => rent.RentalDuration).ToList();
+        var actualMin = durations.Min();
+        var actualMax = durations.Max();
+        var actualAvg = durations.Average();
 
         Assert.Equal(expectedMin, actualMin);
         Assert.Equal(expectedMax, actualMax);
@@ -92,30 +91,17 @@ public class BikesTests(BikesFixture fixture) : IClassFixture<BikesFixture>
     /// <summary>
     /// A test that outputs the total rental time of each type of bike
     /// </summary>
-    [Fact]
-    public void TotalRentalTimeByType() 
+    [Theory]
+    [InlineData(BikeType.Sport, 17)]
+    [InlineData(BikeType.Mountain, 30)]
+    [InlineData(BikeType.City, 12)]
+    public void TotalRentalTimeByType(BikeType bikeType, int expectedRentalTime)
     {
-        var expectedSportRentalTime = 17;
-        var expectedMountainRentaltime = 30;
-        var expectedCityRentaltime = 12;
+        var actualRentalTime = fixture.Rents
+            .Where(rent => rent.Bike.Model.Type == bikeType)
+            .Sum(rent => rent.RentalDuration);
 
-        var actual = fixture.Rents
-            .GroupBy(rent => rent.Bike.Model.Type)
-            .Select(group => new
-            {
-                ModelType = group.Key,
-                TotalRentalTime = group.Sum(rent => rent.RentalDuration)
-            })
-            .Select(x => x)
-            .ToList();
-
-        var actualSportRentalTime = actual.Where(x => x.ModelType == BikeType.Sport).Select(x => x.TotalRentalTime).First();
-        var actualMountainRentaltime = actual.Where(x => x.ModelType == BikeType.Mountain).Select(x => x.TotalRentalTime).First();
-        var actualCityRentaltime = actual.Where(x => x.ModelType == BikeType.City).Select(x => x.TotalRentalTime).First();
-
-        Assert.Equal(expectedSportRentalTime, actualSportRentalTime);
-        Assert.Equal(expectedMountainRentaltime, actualMountainRentaltime);
-        Assert.Equal(expectedCityRentaltime, actualCityRentaltime);
+        Assert.Equal(expectedRentalTime, actualRentalTime);
     }
 
     /// <summary>
@@ -131,7 +117,6 @@ public class BikesTests(BikesFixture fixture) : IClassFixture<BikesFixture>
             .Select(group => new
             {
                 RenterId = group.Key,
-                RenterName = fixture.Renters.First(r => r.Id == group.Key),
                 TotalRentals = group.Count()
             })
             .OrderByDescending(r => r.TotalRentals)

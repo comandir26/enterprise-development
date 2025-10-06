@@ -1,4 +1,5 @@
 ﻿using Bikes.Domain.Models;
+using System.Collections.Generic;
 
 namespace Bikes.Tests;
 
@@ -10,7 +11,37 @@ public class BikesFixture
     /// <summary>
     /// List of bike models
     /// </summary>
-    public List<BikeModel> BikeModels =>
+    public readonly List<BikeModel> BikeModels;
+
+    /// <summary>
+    /// List of bikes
+    /// </summary>
+    public readonly List<Bike> Bikes;
+
+    /// <summary>
+    /// List of renters
+    /// </summary>
+    public readonly List<Renter> Renters;
+
+    /// <summary>
+    /// List of rents
+    /// </summary>
+    public readonly List<Rent> Rents;
+
+    public BikesFixture()
+    {
+        BikeModels = InitializeBikeModels();
+        Renters = InitializeRenters();
+        Bikes = InitializeBikes();
+        Rents = InitializeRents();
+    }
+
+    /// <summary>
+    /// List of bike models
+    /// </summary>
+    private List<BikeModel> InitializeBikeModels()
+    {
+        return
         [
             new() { Id = 1, Type = BikeType.Mountain, WheelSize = 29, MaxPassengerWeight = 120, Weight = 14, BrakeType = "Дисковые гидравлические", Year = "2023", RentPrice = 700 },
             new() { Id = 2, Type = BikeType.Sport, WheelSize = 27, MaxPassengerWeight = 110, Weight = 11, BrakeType = "Ободные v-brake", Year = "2024", RentPrice = 850 },
@@ -23,11 +54,14 @@ public class BikesFixture
             new() { Id = 9, Type = BikeType.City, WheelSize = 26, MaxPassengerWeight = 140, Weight = 18, BrakeType = "Дисковые механические", Year = "2022", RentPrice = 600 },
             new() { Id = 10, Type = BikeType.Mountain, WheelSize = 26, MaxPassengerWeight = 130, Weight = 14, BrakeType = "Дисковые гидравлические", Year = "2024", RentPrice = 650 }
         ];
+    }
 
     /// <summary>
     /// List of bikes
     /// </summary>
-    public List<Bike> Bikes =>
+    private List<Bike> InitializeBikes()
+    {
+        return
         [
             new() { Id = 1, SerialNumber = "MTB202301001", Color = "Черный", Model = BikeModels[0] },
             new() { Id = 2, SerialNumber = "SPT202402001", Color = "Красный", Model = BikeModels[1] },
@@ -40,11 +74,14 @@ public class BikesFixture
             new() { Id = 9, SerialNumber = "CTY202205001", Color = "Серый", Model = BikeModels[8] },
             new() { Id = 10, SerialNumber = "MTB202405001", Color = "Голубой", Model = BikeModels[9] }
         ];
+    }
 
     /// <summary>
     /// List of renters
     /// </summary>
-    public List<Renter> Renters =>
+    private List<Renter> InitializeRenters()
+    {
+        return
         [
             new() { Id = 1, FullName = "Иванов Иван Иванович", Number = "+7 (912) 345-67-89" },
             new() { Id = 2, FullName = "Петров Петр Сергеевич", Number = "+7 (923) 456-78-90" },
@@ -57,11 +94,13 @@ public class BikesFixture
             new() { Id = 9, FullName = "Орлова Ольга Павловна", Number = "+7 (990) 123-45-67" },
             new() { Id = 10, FullName = "Федоров Артем Константинович", Number = "+7 (901) 234-56-78" }
         ];
-
+    }
     /// <summary>
     /// List of rents
     /// </summary>
-    public List<Rent> Rents =>
+    private List<Rent> InitializeRents()
+    {
+        return
         [
             new() { Id = 1, RentalStartTime = new DateTime(2025, 6, 10, 9, 0, 0), RentalDuration = 3, Renter = Renters[0], Bike = Bikes[0] },
             new() { Id = 2, RentalStartTime = new DateTime(2025, 6, 12, 14, 30, 0), RentalDuration = 2, Renter = Renters[1], Bike = Bikes[0] },
@@ -84,4 +123,5 @@ public class BikesFixture
             new() { Id = 19, RentalStartTime = new DateTime(2025, 7, 25, 14, 0, 0), RentalDuration = 3, Renter = Renters[5], Bike = Bikes[9] },
             new() { Id = 20, RentalStartTime = new DateTime(2025, 7, 28, 16, 0, 0), RentalDuration = 4, Renter = Renters[2], Bike = Bikes[9] }
         ];
+    }
 }
