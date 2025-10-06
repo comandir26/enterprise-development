@@ -42,7 +42,7 @@ public class BikesFixture
     /// <summary>
     /// A method that initializes list of bike models
     /// </summary>
-    private List<BikeModel> InitializeBikeModels()
+    private static List<BikeModel> InitializeBikeModels()
     {
         return
         [
@@ -82,7 +82,7 @@ public class BikesFixture
     /// <summary>
     /// A method that initializes list of renters
     /// </summary>
-    private List<Renter> InitializeRenters()
+    private static List<Renter> InitializeRenters()
     {
         return
         [
