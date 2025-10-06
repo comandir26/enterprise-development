@@ -28,6 +28,9 @@ public class BikesFixture
     /// </summary>
     public readonly List<Rent> Rents;
 
+    /// <summary>
+    /// Initializes a new instance of the BikesFixture class.
+    /// </summary>
     public BikesFixture()
     {
         BikeModels = InitializeBikeModels();
@@ -37,7 +40,7 @@ public class BikesFixture
     }
 
     /// <summary>
-    /// List of bike models
+    /// A method that initializes list of bike models
     /// </summary>
     private List<BikeModel> InitializeBikeModels()
     {
@@ -57,7 +60,7 @@ public class BikesFixture
     }
 
     /// <summary>
-    /// List of bikes
+    /// A method that initializes list of bikes
     /// </summary>
     private List<Bike> InitializeBikes()
     {
@@ -77,7 +80,7 @@ public class BikesFixture
     }
 
     /// <summary>
-    /// List of renters
+    /// A method that initializes list of renters
     /// </summary>
     private List<Renter> InitializeRenters()
     {
@@ -95,8 +98,9 @@ public class BikesFixture
             new() { Id = 10, FullName = "Федоров Артем Константинович", Number = "+7 (901) 234-56-78" }
         ];
     }
+
     /// <summary>
-    /// List of rents
+    /// A method that initializes list of rents
     /// </summary>
     private List<Rent> InitializeRents()
     {
