@@ -7,6 +7,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Bikes.Domain", "Bikes.Domai
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Bikes.Tests", "Bikes.Tests\Bikes.Tests.csproj", "{54F042E8-6681-4802-B300-ADFE25207ACB}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Bikes.Infrastructure.InMemory", "Bikes.Infrastructure.InMemory\Bikes.Infrastructure.InMemory.csproj", "{610AD524-2BD4-429B-AAC9-D5AD48B8C50D}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -21,6 +23,10 @@ Global
 		{54F042E8-6681-4802-B300-ADFE25207ACB}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{54F042E8-6681-4802-B300-ADFE25207ACB}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{54F042E8-6681-4802-B300-ADFE25207ACB}.Release|Any CPU.Build.0 = Release|Any CPU
+		{610AD524-2BD4-429B-AAC9-D5AD48B8C50D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{610AD524-2BD4-429B-AAC9-D5AD48B8C50D}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{610AD524-2BD4-429B-AAC9-D5AD48B8C50D}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{610AD524-2BD4-429B-AAC9-D5AD48B8C50D}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
