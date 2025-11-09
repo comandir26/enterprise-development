@@ -9,6 +9,11 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Bikes.Tests", "Bikes.Tests\
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Bikes.Infrastructure.InMemory", "Bikes.Infrastructure.InMemory\Bikes.Infrastructure.InMemory.csproj", "{610AD524-2BD4-429B-AAC9-D5AD48B8C50D}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Bikes.Application", "Bikes.Application\Bikes.Application.csproj", "{619487B4-C5C4-4396-B2DF-18B83CD522CE}"
+	ProjectSection(ProjectDependencies) = postProject
+		{B6E3E827-ADA9-4B0E-B704-484513A051A8} = {B6E3E827-ADA9-4B0E-B704-484513A051A8}
+	EndProjectSection
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -27,6 +32,10 @@ Global
 		{610AD524-2BD4-429B-AAC9-D5AD48B8C50D}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{610AD524-2BD4-429B-AAC9-D5AD48B8C50D}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{610AD524-2BD4-429B-AAC9-D5AD48B8C50D}.Release|Any CPU.Build.0 = Release|Any CPU
+		{619487B4-C5C4-4396-B2DF-18B83CD522CE}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{619487B4-C5C4-4396-B2DF-18B83CD522CE}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{619487B4-C5C4-4396-B2DF-18B83CD522CE}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{619487B4-C5C4-4396-B2DF-18B83CD522CE}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
