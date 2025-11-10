@@ -4,10 +4,19 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace Bikes.Api.Host.Controllers;
 
+/// <summary>
+/// A class that implements a controller for processing HTTP requests for the RentService class
+/// </summary>
+/// <param name="service"></param>
+/// <param name="logger"></param>
 [ApiController]
 [Route("api/[controller]")]
 public class RentsController(IRentService service, ILogger<RentsController> logger) : ControllerBase
 {
+    /// <summary>
+    /// Returns all existing objects
+    /// </summary>
+    /// <returns></returns>
     [HttpGet]
     public IActionResult GetAllRents()
     {
@@ -25,6 +34,11 @@ public class RentsController(IRentService service, ILogger<RentsController> logg
         }
     }
 
+    /// <summary>
+    /// Returns object by id
+    /// </summary>
+    /// <param name="id"></param>
+    /// <returns></returns>
     [HttpGet("{id:int}")]
     public IActionResult GetRent(int id)
     {
@@ -48,6 +62,11 @@ public class RentsController(IRentService service, ILogger<RentsController> logg
         }
     }
 
+    /// <summary>
+    /// Creates a new object
+    /// </summary>
+    /// <param name="rentDto"></param>
+    /// <returns></returns>
     [HttpPost]
     public IActionResult CreateRent([FromBody] RentDto rentDto)
     {
@@ -79,6 +98,12 @@ public class RentsController(IRentService service, ILogger<RentsController> logg
         }
     }
 
+    /// <summary>
+    /// Updates an existing object
+    /// </summary>
+    /// <param name="id"></param>
+    /// <param name="rentDto"></param>
+    /// <returns></returns>
     [HttpPut("{id:int}")]
     public IActionResult UpdateRent(int id, [FromBody] RentDto rentDto)
     {
@@ -113,6 +138,11 @@ public class RentsController(IRentService service, ILogger<RentsController> logg
         }
     }
 
+    /// <summary>
+    /// Deletes an existing object by id
+    /// </summary>
+    /// <param name="id"></param>
+    /// <returns></returns>
     [HttpDelete("{id:int}")]
     public IActionResult DeleteRent(int id)
     {

@@ -13,14 +13,12 @@ public class BikesTests(BikesFixture fixture) : IClassFixture<BikesFixture>
     [Fact]
     public void InformationAboutSportBikes()
     {
-        var expectedModelIds = new List<int> {2, 5, 8};
+        var expectedBikeIds = new List<int> { 2, 5, 8 };
 
-        var actualIds = fixture.Bikes
-            .Where(bike => bike.Model.Type == BikeType.Sport)
-            .Select(bike => bike.Id)
-            .ToList();
+        var sportBikes = fixture.AnalyticsService.GetSportBikes();
+        var actualIds = sportBikes.Select(bike => bike.Id).ToList();
 
-        Assert.Equal(expectedModelIds, actualIds);
+        Assert.Equal(expectedBikeIds, actualIds);
     }
 
     /// <summary>
@@ -29,19 +27,10 @@ public class BikesTests(BikesFixture fixture) : IClassFixture<BikesFixture>
     [Fact]
     public void TopFiveModelsRentDurationIds()
     {
-        var expectedModelIds = new List<int> {10, 1, 2, 5, 3}; 
+        var expectedModelIds = new List<int> { 10, 1, 2, 5, 3 };
 
-        var actualIds = fixture.Rents
-            .GroupBy(rent => rent.Bike.Model.Id)
-            .Select(group => new
-            {
-                ModelId = group.Key,
-                TotalDuration = group.Sum(rent => rent.RentalDuration)
-            })
-            .OrderByDescending(x => x.TotalDuration)
-            .Select(x => x.ModelId)
-            .Take(5)
-            .ToList();
+        var topModels = fixture.AnalyticsService.GetTopFiveModelsByRentDuration();
+        var actualIds = topModels.Select(model => model.Id).ToList();
 
         Assert.Equal(expectedModelIds, actualIds);
     }
@@ -52,19 +41,11 @@ public class BikesTests(BikesFixture fixture) : IClassFixture<BikesFixture>
     [Fact]
     public void TopFiveModelsProfit()
     {
-        var expectedModelIds = new List<int> {10, 5, 2, 1, 3};
+        var expectedModelIds = new List<int> { 10, 5, 2, 1, 3 };
 
-        var actualIds = fixture.Rents
-            .GroupBy(rent => rent.Bike.Model.Id)
-            .Select(group => new
-            {
-                ModelId = group.Key,
-                TotalProfit = group.Sum(rent => rent.RentalDuration * rent.Bike.Model.RentPrice)
-            })
-            .OrderByDescending(x => x.TotalProfit)
-            .Select(x => x.ModelId)
-            .Take(5)
-            .ToList();
+        var topModels = fixture.AnalyticsService.GetTopFiveModelsByProfit();
+        var actualIds = topModels.Select(model => model.Id).ToList();
+
         Assert.Equal(expectedModelIds, actualIds);
     }
 
@@ -78,10 +59,7 @@ public class BikesTests(BikesFixture fixture) : IClassFixture<BikesFixture>
         const int expectedMax = 5;
         const double expectedAvg = 2.95;
 
-        var durations = fixture.Rents.Select(rent => rent.RentalDuration).ToList();
-        var actualMin = durations.Min();
-        var actualMax = durations.Max();
-        var actualAvg = durations.Average();
+        var (actualMin, actualMax, actualAvg) = fixture.AnalyticsService.GetRentalDurationStats();
 
         Assert.Equal(expectedMin, actualMin);
         Assert.Equal(expectedMax, actualMax);
@@ -97,9 +75,8 @@ public class BikesTests(BikesFixture fixture) : IClassFixture<BikesFixture>
     [InlineData(BikeType.City, 12)]
     public void TotalRentalTimeByType(BikeType bikeType, int expectedRentalTime)
     {
-        var actualRentalTime = fixture.Rents
-            .Where(rent => rent.Bike.Model.Type == bikeType)
-            .Sum(rent => rent.RentalDuration);
+        var rentalTimeByType = fixture.AnalyticsService.GetTotalRentalTimeByType();
+        var actualRentalTime = rentalTimeByType[bikeType];
 
         Assert.Equal(expectedRentalTime, actualRentalTime);
     }
@@ -110,19 +87,10 @@ public class BikesTests(BikesFixture fixture) : IClassFixture<BikesFixture>
     [Fact]
     public void TopThreeRenters()
     {
-        var expectedTopRentersIds = new List<int> {1, 2, 6};
+        var expectedTopRentersIds = new List<int> { 1, 2, 6 };
 
-        var actualTopRentersIds = fixture.Rents
-            .GroupBy(rent => rent.Renter.Id)
-            .Select(group => new
-            {
-                RenterId = group.Key,
-                TotalRentals = group.Count()
-            })
-            .OrderByDescending(r => r.TotalRentals)
-            .Select(x => x.RenterId)
-            .Take(3)
-            .ToList();
+        var topRenters = fixture.AnalyticsService.GetTopThreeRenters();
+        var actualTopRentersIds = topRenters.Select(renter => renter.Id).ToList();
 
         Assert.Equal(expectedTopRentersIds, actualTopRentersIds);
     }

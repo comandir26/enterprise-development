@@ -3,10 +3,18 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace Bikes.Api.Host.Controllers;
 
+/// <summary>
+/// A class that implements a controller for processing HTTP requests for the AnalyticsService class
+/// </summary>
+/// <param name="service"></param>
+/// <param name="logger"></param>
 [ApiController]
 [Route("api/[controller]")]
 public class AnalyticsController(IAnalyticsService service, ILogger<AnalyticsController> logger) : ControllerBase
 {
+    /// <summary>
+    /// A method that returns information about all sports bikes
+    /// </summary>
     [HttpGet("sport-bikes")]
     public IActionResult GetSportBikes()
     {
@@ -24,6 +32,9 @@ public class AnalyticsController(IAnalyticsService service, ILogger<AnalyticsCon
         }
     }
 
+    /// <summary>
+    /// A method that returns the top 5 bike models by rental duration
+    /// </summary>
     [HttpGet("top-models/duration")]
     public IActionResult GetTopModelsByDuration()
     {
@@ -41,6 +52,9 @@ public class AnalyticsController(IAnalyticsService service, ILogger<AnalyticsCon
         }
     }
 
+    /// <summary>
+    /// A method that returns the top 5 bike models in terms of rental income
+    /// </summary>
     [HttpGet("top-models/profit")]
     public IActionResult GetTopModelsByProfit()
     {
@@ -58,6 +72,9 @@ public class AnalyticsController(IAnalyticsService service, ILogger<AnalyticsCon
         }
     }
 
+    /// <summary>
+    /// A method that returns information about the minimum, maximum, and average bike rental time.
+    /// </summary>
     [HttpGet("stats/duration")]
     public IActionResult GetRentalDurationStats()
     {
@@ -81,6 +98,9 @@ public class AnalyticsController(IAnalyticsService service, ILogger<AnalyticsCon
         }
     }
 
+    /// <summary>
+    /// A method that returns the total rental time of each type of bike
+    /// </summary>
     [HttpGet("stats/rental-time-by-type")]
     public IActionResult GetTotalRentalTimeByType()
     {
@@ -98,6 +118,9 @@ public class AnalyticsController(IAnalyticsService service, ILogger<AnalyticsCon
         }
     }
 
+    /// <summary>
+    /// A method that returns information about the customers who have rented bicycles the most times.
+    /// </summary>
     [HttpGet("top-renters")]
     public IActionResult GetTopRenters()
     {

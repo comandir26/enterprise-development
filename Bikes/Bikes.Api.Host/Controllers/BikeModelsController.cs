@@ -4,10 +4,19 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace Bikes.Api.Host.Controllers;
 
+/// <summary>
+/// A class that implements a controller for processing HTTP requests for the BikeModels class
+/// </summary>
+/// <param name="service"></param>
+/// <param name="logger"></param>
 [ApiController]
 [Route("api/[controller]")]
 public class BikeModelsController(IBikeModelService service, ILogger<BikeModelsController> logger) : ControllerBase
 {
+    /// <summary>
+    /// Returns all existing objects
+    /// </summary>
+    /// <returns></returns>
     [HttpGet]
     public IActionResult GetAllBikeModels()
     {
@@ -25,6 +34,11 @@ public class BikeModelsController(IBikeModelService service, ILogger<BikeModelsC
         }
     }
 
+    /// <summary>
+    /// Returns object by id
+    /// </summary>
+    /// <param name="id"></param>
+    /// <returns></returns>
     [HttpGet("{id:int}")]
     public IActionResult GetBikeModel(int id)
     {
@@ -48,6 +62,11 @@ public class BikeModelsController(IBikeModelService service, ILogger<BikeModelsC
         }
     }
 
+    /// <summary>
+    /// Creates a new object
+    /// </summary>
+    /// <param name="bikeModelDto"></param>
+    /// <returns></returns>
     [HttpPost]
     public IActionResult CreateBikeModel([FromBody] BikeModelDto bikeModelDto)
     {
@@ -73,6 +92,12 @@ public class BikeModelsController(IBikeModelService service, ILogger<BikeModelsC
         }
     }
 
+    /// <summary>
+    /// Updates an existing object
+    /// </summary>
+    /// <param name="id"></param>
+    /// <param name="bikeModelDto"></param>
+    /// <returns></returns>
     [HttpPut("{id:int}")]
     public IActionResult UpdateBikeModel(int id, [FromBody] BikeModelDto bikeModelDto)
     {
@@ -102,6 +127,11 @@ public class BikeModelsController(IBikeModelService service, ILogger<BikeModelsC
         }
     }
 
+    /// <summary>
+    /// Deletes an existing object by id
+    /// </summary>
+    /// <param name="id"></param>
+    /// <returns></returns>
     [HttpDelete("{id:int}")]
     public IActionResult DeleteBikeModel(int id)
     {

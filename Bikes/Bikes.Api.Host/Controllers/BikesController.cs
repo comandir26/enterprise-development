@@ -4,10 +4,19 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace Bikes.Api.Host.Controllers;
 
+/// <summary>
+/// A class that implements a controller for processing HTTP requests for the BikeService class
+/// </summary>
+/// <param name="service"></param>
+/// <param name="logger"></param>
 [ApiController]
 [Route("api/[controller]")]
 public class BikesController(IBikeService service, ILogger<BikesController> logger) : ControllerBase
 {
+    /// <summary>
+    /// Returns all existing objects
+    /// </summary>
+    /// <returns></returns>
     [HttpGet]
     public IActionResult GetAllBikes()
     {
@@ -25,6 +34,11 @@ public class BikesController(IBikeService service, ILogger<BikesController> logg
         }
     }
 
+    /// <summary>
+    /// Returns object by id
+    /// </summary>
+    /// <param name="id"></param>
+    /// <returns></returns>
     [HttpGet("{id:int}")]
     public IActionResult GetBike(int id)
     {
@@ -49,6 +63,11 @@ public class BikesController(IBikeService service, ILogger<BikesController> logg
         }
     }
 
+    /// <summary>
+    /// Creates a new object
+    /// </summary>
+    /// <param name="bikeDto"></param>
+    /// <returns></returns>
     [HttpPost]
     public IActionResult CreateBike([FromBody] BikeDto bikeDto)
     {
@@ -79,6 +98,12 @@ public class BikesController(IBikeService service, ILogger<BikesController> logg
         }
     }
 
+    /// <summary>
+    /// Updates an existing object
+    /// </summary>
+    /// <param name="id"></param>
+    /// <param name="bikeDto"></param>
+    /// <returns></returns>
     [HttpPut("{id:int}")]
     public IActionResult UpdateBike(int id, [FromBody] BikeDto bikeDto)
     {
@@ -114,6 +139,11 @@ public class BikesController(IBikeService service, ILogger<BikesController> logg
         }
     }
 
+    /// <summary>
+    /// Deletes an existing object by id
+    /// </summary>
+    /// <param name="id"></param>
+    /// <returns></returns>
     [HttpDelete("{id:int}")]
     public IActionResult DeleteBike(int id)
     {

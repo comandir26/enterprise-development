@@ -8,7 +8,6 @@
 
   <ItemGroup>
     <ProjectReference Include="..\Bikes.Domain\Bikes.Domain.csproj" />
-    <ProjectReference Include="..\Bikes.Tests\Bikes.Tests.csproj" />
   </ItemGroup>
 
 </Project>

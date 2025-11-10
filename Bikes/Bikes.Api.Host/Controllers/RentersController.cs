@@ -4,10 +4,19 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace Bikes.Api.Host.Controllers;
 
+/// <summary>
+/// A class that implements a controller for processing HTTP requests for the RenterService class
+/// </summary>
+/// <param name="service"></param>
+/// <param name="logger"></param>
 [ApiController]
 [Route("api/[controller]")]
 public class RentersController(IRenterService service, ILogger<RentersController> logger) : ControllerBase
 {
+    /// <summary>
+    /// Returns all existing objects
+    /// </summary>
+    /// <returns></returns>
     [HttpGet]
     public IActionResult GetAllRenters()
     {
@@ -25,6 +34,11 @@ public class RentersController(IRenterService service, ILogger<RentersController
         }
     }
 
+    /// <summary>
+    /// Returns object by id
+    /// </summary>
+    /// <param name="id"></param>
+    /// <returns></returns>
     [HttpGet("{id:int}")]
     public IActionResult GetRenter(int id)
     {
@@ -48,6 +62,11 @@ public class RentersController(IRenterService service, ILogger<RentersController
         }
     }
 
+    /// <summary>
+    /// Creates a new objec
+    /// </summary>
+    /// <param name="renterDto"></param>
+    /// <returns></returns>
     [HttpPost]
     public IActionResult CreateRenter([FromBody] RenterDto renterDto)
     {
@@ -73,6 +92,12 @@ public class RentersController(IRenterService service, ILogger<RentersController
         }
     }
 
+    /// <summary>
+    /// Updates an existing object
+    /// </summary>
+    /// <param name="id"></param>
+    /// <param name="renterDto"></param>
+    /// <returns></returns>
     [HttpPut("{id:int}")]
     public IActionResult UpdateRenter(int id, [FromBody] RenterDto renterDto)
     {
@@ -102,6 +127,11 @@ public class RentersController(IRenterService service, ILogger<RentersController
         }
     }
 
+    /// <summary>
+    /// Deletes an existing object by id
+    /// </summary>
+    /// <param name="id"></param>
+    /// <returns></returns>
     [HttpDelete("{id:int}")]
     public IActionResult DeleteRenter(int id)
     {

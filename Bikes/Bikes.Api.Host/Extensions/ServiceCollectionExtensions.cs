@@ -4,8 +4,16 @@ using Bikes.Infrastructure.InMemory.Repositories;
 
 namespace Bikes.Api.Host.Extensions;
 
+/// <summary>
+/// A class for hidden registration of services
+/// </summary>
 public static class ServiceCollectionExtensions
 {
+    /// <summary>
+    /// The method that registers services
+    /// </summary>
+    /// <param name="services"></param>
+    /// <returns></returns>
     public static IServiceCollection AddBikeRentalServices(this IServiceCollection services)
     {
         services.AddSingleton<IRepository<Bikes.Domain.Models.Bike, int>, InMemoryBikeRepository>();
