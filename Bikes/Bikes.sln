@@ -14,6 +14,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Bikes.Application", "Bikes.
 		{B6E3E827-ADA9-4B0E-B704-484513A051A8} = {B6E3E827-ADA9-4B0E-B704-484513A051A8}
 	EndProjectSection
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Bikes.Api.Host", "Bikes.Api.Host\Bikes.Api.Host.csproj", "{B5E2CA3E-DD81-4B28-8783-1D1EE5352EF3}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -36,6 +38,10 @@ Global
 		{619487B4-C5C4-4396-B2DF-18B83CD522CE}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{619487B4-C5C4-4396-B2DF-18B83CD522CE}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{619487B4-C5C4-4396-B2DF-18B83CD522CE}.Release|Any CPU.Build.0 = Release|Any CPU
+		{B5E2CA3E-DD81-4B28-8783-1D1EE5352EF3}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B5E2CA3E-DD81-4B28-8783-1D1EE5352EF3}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B5E2CA3E-DD81-4B28-8783-1D1EE5352EF3}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{B5E2CA3E-DD81-4B28-8783-1D1EE5352EF3}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

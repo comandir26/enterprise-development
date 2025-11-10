@@ -2,8 +2,14 @@
 
 namespace Bikes.Infrastructure.InMemory.Seeders;
 
+/// <summary>
+/// InMemorySeeder for creating the data
+/// </summary>
 public static class InMemorySeeder
 {
+    /// <summary>
+    /// A static method that creates a list of bike models
+    /// </summary>
     public static List<BikeModel> GetBikeModels()
     {
         return
@@ -21,6 +27,9 @@ public static class InMemorySeeder
         ];
     }
 
+    /// <summary>
+    /// A static method that creates a list of bikes
+    /// </summary>
     public static List<Bike> GetBikes()
     {
         var models = GetBikeModels();
@@ -40,6 +49,9 @@ public static class InMemorySeeder
         ];
     }
 
+    /// <summary>
+    /// A static method that creates a list of renters
+    /// </summary>
     public static List<Renter> GetRenters()
     {
         return
@@ -58,7 +70,7 @@ public static class InMemorySeeder
     }
 
     /// <summary>
-    /// A method that initializes list of rents
+    /// A static method that creates a list of rents
     /// </summary>
     public static List<Rent> GetRents()
     {

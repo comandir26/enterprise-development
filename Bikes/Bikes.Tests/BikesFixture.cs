@@ -1,5 +1,4 @@
 ﻿using Bikes.Domain.Models;
-using System.Collections.Generic;
 
 namespace Bikes.Tests;
 
