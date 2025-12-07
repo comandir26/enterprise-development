@@ -1,4 +1,5 @@
-﻿using Bikes.Application.Dto;
+﻿using AutoMapper;
+using Bikes.Contracts.Dto;
 using Bikes.Domain.Models;
 using Bikes.Domain.Repositories;
 
@@ -7,35 +8,10 @@ namespace Bikes.Application.Services;
 /// <summary>
 /// A class that implements the interface of the RenterService class
 /// </summary>
-public class RenterService : IRenterService
+public class RenterService(
+    IRepository<Renter, int> renterRepository,
+    IMapper mapper) : IRenterService
 {
-    private readonly IRepository<Renter, int> _renterRepository;
-
-    /// <summary>
-    /// The constructor that initializes repositories
-    /// </summary>
-    /// <param name="renterRepository"></param>
-    public RenterService(IRepository<Renter, int> renterRepository)
-    {
-        _renterRepository = renterRepository;
-    }
-
-    /// <summary>
-    /// A method that maps a DTO object to a domain object
-    /// </summary>
-    /// <param name="dto"></param>
-    /// <param name="id"></param>
-    /// <returns></returns>
-    private static Renter MapToDomain(RenterDto dto, int id = 0)
-    {
-        return new Renter
-        {
-            Id = id,
-            FullName = dto.FullName,
-            Number = dto.Number
-        };
-    }
-
     /// <summary>
     /// Creates a new object
     /// </summary>
@@ -43,22 +19,30 @@ public class RenterService : IRenterService
     /// <returns></returns>
     public int CreateRenter(RenterDto renterDto)
     {
-        var renter = MapToDomain(renterDto);
-        return _renterRepository.Create(renter);
+        var renter = mapper.Map<Renter>(renterDto);
+        return renterRepository.Create(renter);
     }
 
     /// <summary>
     /// Returns all existing objects
     /// </summary>
     /// <returns></returns>
-    public List<Renter> GetAllRenters() => _renterRepository.ReadAll();
+    public List<RenterDto> GetAllRenters()
+    {
+        var renters = renterRepository.ReadAll();
+        return mapper.Map<List<RenterDto>>(renters);
+    }
 
     /// <summary>
     /// Returns object by id
     /// </summary>
     /// <param name="id"></param>
     /// <returns></returns>
-    public Renter? GetRenterById(int id) => _renterRepository.Read(id);
+    public RenterDto? GetRenterById(int id)
+    {
+        var renter = renterRepository.Read(id);
+        return renter != null ? mapper.Map<RenterDto>(renter) : null;
+    }
 
     /// <summary>
     /// Updates an existing object
@@ -66,13 +50,15 @@ public class RenterService : IRenterService
     /// <param name="id"></param>
     /// <param name="renterDto"></param>
     /// <returns></returns>
-    public Renter? UpdateRenter(int id, RenterDto renterDto)
+    public RenterDto? UpdateRenter(int id, RenterDto renterDto)
     {
-        var existingRenter = _renterRepository.Read(id);
+        var existingRenter = renterRepository.Read(id);
         if (existingRenter == null) return null;
 
-        var updatedRenter = MapToDomain(renterDto, id);
-        return _renterRepository.Update(id, updatedRenter);
+        mapper.Map(renterDto, existingRenter);
+
+        var updatedRenter = renterRepository.Update(id, existingRenter);
+        return updatedRenter != null ? mapper.Map<RenterDto>(updatedRenter) : null;
     }
 
     /// <summary>
@@ -80,5 +66,5 @@ public class RenterService : IRenterService
     /// </summary>
     /// <param name="id"></param>
     /// <returns></returns>
-    public bool DeleteRenter(int id) => _renterRepository.Delete(id);
+    public bool DeleteRenter(int id) => renterRepository.Delete(id);
 }

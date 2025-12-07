@@ -9,7 +9,7 @@ namespace Bikes.Infrastructure.InMemory.Repositories;
 /// </summary>
 public class InMemoryBikeModelRepository : IRepository<BikeModel, int>
 {
-    private readonly List<BikeModel> _items = [];
+    private readonly List<BikeModel> _items;
 
     private int _currentId;
 

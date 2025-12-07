@@ -1,4 +1,5 @@
-﻿using Bikes.Application.Dto;
+﻿using AutoMapper;
+using Bikes.Contracts.Dto;
 using Bikes.Domain.Models;
 using Bikes.Domain.Repositories;
 
@@ -7,40 +8,10 @@ namespace Bikes.Application.Services;
 /// <summary>
 /// A class that implements the interface of the BikeModelService class
 /// </summary>
-public class BikeModelService : IBikeModelService
+public class BikeModelService(
+    IRepository<BikeModel, int> bikeModelRepository,
+    IMapper mapper) : IBikeModelService
 {
-    private readonly IRepository<BikeModel, int> _bikeModelRepository;
-
-    /// <summary>
-    /// The constructor that initializes repositories
-    /// </summary>
-    /// <param name="bikeModelRepository"></param>
-    public BikeModelService(IRepository<BikeModel, int> bikeModelRepository)
-    {
-        _bikeModelRepository = bikeModelRepository;
-    }
-
-    /// <summary>
-    /// A method that maps a DTO object to a domain object
-    /// </summary>
-    /// <param name="dto"></param>
-    /// <param name="id"></param>
-    /// <returns></returns>
-    private static BikeModel MapToDomain(BikeModelDto dto, int id = 0)
-    {
-        return new BikeModel
-        {
-            Id = id,
-            Type = dto.Type,
-            WheelSize = dto.WheelSize,
-            MaxPassengerWeight = dto.MaxPassengerWeight,
-            Weight = dto.Weight,
-            BrakeType = dto.BrakeType,
-            Year = dto.Year,
-            RentPrice = dto.RentPrice
-        };
-    }
-
     /// <summary>
     /// Creates a new object
     /// </summary>
@@ -48,22 +19,38 @@ public class BikeModelService : IBikeModelService
     /// <returns>ID of the created object</returns>
     public int CreateBikeModel(BikeModelDto bikeModelDto)
     {
-        var bikeModel = MapToDomain(bikeModelDto);
-        return _bikeModelRepository.Create(bikeModel);
+        var bikeModel = mapper.Map<BikeModel>(bikeModelDto);
+
+        return bikeModelRepository.Create(bikeModel);
     }
 
     /// <summary>
     /// Returns all existing objects
     /// </summary>
     /// <returns>List of existing objects</returns>
-    public List<BikeModel> GetAllBikeModels() => _bikeModelRepository.ReadAll();
+    public List<BikeModelDto> GetAllBikeModels()
+    {
+        var models = bikeModelRepository.ReadAll();
+
+        return models.Select(model =>
+        {
+            var dto = mapper.Map<BikeModelDto>(model);
+            return dto;
+        }).ToList();
+    }
 
     /// <summary>
     /// Returns object by id
     /// </summary>
     /// <param name="id"></param>
     /// <returns></returns>
-    public BikeModel? GetBikeModelById(int id) => _bikeModelRepository.Read(id);
+    public BikeModelDto? GetBikeModelById(int id)
+    {
+        var model = bikeModelRepository.Read(id);
+        if (model == null) return null;
+
+        return mapper.Map<BikeModelDto>(model);
+    }
 
     /// <summary>
     /// Updates an existing object
@@ -71,13 +58,19 @@ public class BikeModelService : IBikeModelService
     /// <param name="id">Id</param>
     /// <param name="bikeModelDto">DTO object</param>
     /// <returns>Object if exist</returns>
-    public BikeModel? UpdateBikeModel(int id, BikeModelDto bikeModelDto)
+    public BikeModelDto? UpdateBikeModel(int id, BikeModelDto bikeModelDto)
     {
-        var existingModel = _bikeModelRepository.Read(id);
+        var existingModel = bikeModelRepository.Read(id);
         if (existingModel == null) return null;
 
-        var updatedModel = MapToDomain(bikeModelDto, id);
-        return _bikeModelRepository.Update(id, updatedModel);
+        mapper.Map(bikeModelDto, existingModel);
+
+        existingModel.Id = id;
+
+        var updatedModel = bikeModelRepository.Update(id, existingModel);
+        if (updatedModel == null) return null;
+
+        return mapper.Map<BikeModelDto>(updatedModel);
     }
 
     /// <summary>
@@ -85,5 +78,5 @@ public class BikeModelService : IBikeModelService
     /// </summary>
     /// <param name="id"></param>
     /// <returns>True or false? result of deleting</returns>
-    public bool DeleteBikeModel(int id) => _bikeModelRepository.Delete(id);
+    public bool DeleteBikeModel(int id) => bikeModelRepository.Delete(id);
 }

@@ -1,4 +1,4 @@
-﻿using Bikes.Application.Dto;
+﻿using Bikes.Contracts.Dto;
 using Bikes.Domain.Models;
 
 namespace Bikes.Application.Services;
@@ -19,14 +19,14 @@ public interface IRentService
     /// Returns all existing objects
     /// </summary>
     /// <returns>List of existing objects</returns>
-    public List<Rent> GetAllRents();
+    public List<RentDto> GetAllRents();
 
     /// <summary>
     /// Returns object by id
     /// </summary>
     /// <param name="id"></param>
     /// <returns></returns>
-    public Rent? GetRentById(int id);
+    public RentDto? GetRentById(int id);
 
     /// <summary>
     /// Updates an existing object
@@ -34,7 +34,7 @@ public interface IRentService
     /// <param name="id">Id</param>
     /// <param name="rentDto">DTO object</param>
     /// <returns>Object if exist</returns>
-    public Rent? UpdateRent(int id, RentDto rentDto);
+    public RentDto? UpdateRent(int id, RentDto rentDto);
 
     /// <summary>
     /// Deletes an existing object by id

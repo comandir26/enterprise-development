@@ -1,4 +1,4 @@
-﻿using Bikes.Application.Dto;
+﻿using Bikes.Contracts.Dto;
 using Bikes.Application.Services;
 using Microsoft.AspNetCore.Mvc;
 
@@ -11,14 +11,16 @@ namespace Bikes.Api.Host.Controllers;
 /// <param name="logger"></param>
 [ApiController]
 [Route("api/[controller]")]
+[Produces("application/json")]
 public class BikesController(IBikeService service, ILogger<BikesController> logger) : ControllerBase
 {
     /// <summary>
     /// Returns all existing objects
     /// </summary>
-    /// <returns></returns>
     [HttpGet]
-    public IActionResult GetAllBikes()
+    [ProducesResponseType(typeof(List<BikeDto>), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status500InternalServerError)]
+    public ActionResult<List<BikeDto>> GetAllBikes()
     {
         try
         {
@@ -30,7 +32,10 @@ public class BikesController(IBikeService service, ILogger<BikesController> logg
         catch (Exception ex)
         {
             logger.LogError(ex, "Error getting all bikes");
-            return StatusCode(500, new { error = "An error occurred while retrieving bikes." });
+            return Problem(
+                title: "Internal Server Error",
+                detail: "An error occurred while retrieving bikes.",
+                statusCode: StatusCodes.Status500InternalServerError);
         }
     }
 
@@ -38,9 +43,11 @@ public class BikesController(IBikeService service, ILogger<BikesController> logg
     /// Returns object by id
     /// </summary>
     /// <param name="id"></param>
-    /// <returns></returns>
     [HttpGet("{id:int}")]
-    public IActionResult GetBike(int id)
+    [ProducesResponseType(typeof(BikeDto), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
+    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status500InternalServerError)]
+    public ActionResult<BikeDto> GetBike(int id)
     {
         try
         {
@@ -50,7 +57,10 @@ public class BikesController(IBikeService service, ILogger<BikesController> logg
             if (bike == null)
             {
                 logger.LogWarning("Bike with ID {BikeId} not found", id);
-                return NotFound(new { error = $"Bike with ID {id} not found." });
+                return Problem(
+                    title: "Not Found",
+                    detail: $"Bike with ID {id} not found.",
+                    statusCode: StatusCodes.Status404NotFound);
             }
 
             logger.LogInformation("Retrieved bike with ID {BikeId}", id);
@@ -59,7 +69,10 @@ public class BikesController(IBikeService service, ILogger<BikesController> logg
         catch (Exception ex)
         {
             logger.LogError(ex, "Error getting bike with ID {BikeId}", id);
-            return StatusCode(500, new { error = "An error occurred while retrieving the bike." });
+            return Problem(
+                title: "Internal Server Error",
+                detail: "An error occurred while retrieving the bike.",
+                statusCode: StatusCodes.Status500InternalServerError);
         }
     }
 
@@ -67,9 +80,11 @@ public class BikesController(IBikeService service, ILogger<BikesController> logg
     /// Creates a new object
     /// </summary>
     /// <param name="bikeDto"></param>
-    /// <returns></returns>
     [HttpPost]
-    public IActionResult CreateBike([FromBody] BikeDto bikeDto)
+    [ProducesResponseType(typeof(CreatedAtActionResult), StatusCodes.Status201Created)]
+    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status500InternalServerError)]
+    public ActionResult<CreatedAtActionResult> CreateBike([FromBody] BikeDto bikeDto)
     {
         try
         {
@@ -77,24 +92,38 @@ public class BikesController(IBikeService service, ILogger<BikesController> logg
 
             if (!ModelState.IsValid)
             {
-                logger.LogWarning("Invalid bike data: {ModelErrors}", ModelState.Values.SelectMany(v => v.Errors));
-                return BadRequest(new { errors = ModelState.Values.SelectMany(v => v.Errors) });
+                logger.LogWarning("Invalid bike data: {ModelErrors}",
+                    ModelState.Values.SelectMany(v => v.Errors.Select(e => e.ErrorMessage)));
+
+                return ValidationProblem(
+                    title: "Validation Error",
+                    detail: "One or more validation errors occurred.",
+                    modelStateDictionary: ModelState);
             }
 
             var id = service.CreateBike(bikeDto);
             logger.LogInformation("Created bike with ID {BikeId}", id);
 
-            return CreatedAtAction(nameof(GetBike), new { id }, new { id, message = "Bike created successfully." });
+            return CreatedAtAction(
+                nameof(GetBike),
+                new { id },
+                new { id, message = "Bike created successfully." });
         }
         catch (ArgumentException ex)
         {
             logger.LogWarning(ex, "Error creating bike: {ErrorMessage}", ex.Message);
-            return BadRequest(new { error = ex.Message });
+            return Problem(
+                title: "Bad Request",
+                detail: ex.Message,
+                statusCode: StatusCodes.Status400BadRequest);
         }
         catch (Exception ex)
         {
             logger.LogError(ex, "Error creating bike");
-            return StatusCode(500, new { error = "An error occurred while creating the bike." });
+            return Problem(
+                title: "Internal Server Error",
+                detail: "An error occurred while creating the bike.",
+                statusCode: StatusCodes.Status500InternalServerError);
         }
     }
 
@@ -103,9 +132,12 @@ public class BikesController(IBikeService service, ILogger<BikesController> logg
     /// </summary>
     /// <param name="id"></param>
     /// <param name="bikeDto"></param>
-    /// <returns></returns>
     [HttpPut("{id:int}")]
-    public IActionResult UpdateBike(int id, [FromBody] BikeDto bikeDto)
+    [ProducesResponseType(typeof(BikeDto), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
+    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status500InternalServerError)]
+    public ActionResult<BikeDto> UpdateBike(int id, [FromBody] BikeDto bikeDto)
     {
         try
         {
@@ -113,29 +145,43 @@ public class BikesController(IBikeService service, ILogger<BikesController> logg
 
             if (!ModelState.IsValid)
             {
-                logger.LogWarning("Invalid bike data for update: {ModelErrors}", ModelState.Values.SelectMany(v => v.Errors));
-                return BadRequest(new { errors = ModelState.Values.SelectMany(v => v.Errors) });
+                logger.LogWarning("Invalid bike data for update: {ModelErrors}",
+                    ModelState.Values.SelectMany(v => v.Errors.Select(e => e.ErrorMessage)));
+
+                return ValidationProblem(
+                    title: "Validation Error",
+                    detail: "One or more validation errors occurred.",
+                    modelStateDictionary: ModelState);
             }
 
             var bike = service.UpdateBike(id, bikeDto);
             if (bike == null)
             {
                 logger.LogWarning("Bike with ID {BikeId} not found for update", id);
-                return NotFound(new { error = $"Bike with ID {id} not found." });
+                return Problem(
+                    title: "Not Found",
+                    detail: $"Bike with ID {id} not found.",
+                    statusCode: StatusCodes.Status404NotFound);
             }
 
             logger.LogInformation("Updated bike with ID {BikeId}", id);
-            return Ok(new { message = "Bike updated successfully.", bike });
+            return Ok(bike);
         }
         catch (ArgumentException ex)
         {
             logger.LogWarning(ex, "Error updating bike: {ErrorMessage}", ex.Message);
-            return BadRequest(new { error = ex.Message });
+            return Problem(
+                title: "Bad Request",
+                detail: ex.Message,
+                statusCode: StatusCodes.Status400BadRequest);
         }
         catch (Exception ex)
         {
             logger.LogError(ex, "Error updating bike with ID {BikeId}", id);
-            return StatusCode(500, new { error = "An error occurred while updating the bike." });
+            return Problem(
+                title: "Internal Server Error",
+                detail: "An error occurred while updating the bike.",
+                statusCode: StatusCodes.Status500InternalServerError);
         }
     }
 
@@ -143,9 +189,11 @@ public class BikesController(IBikeService service, ILogger<BikesController> logg
     /// Deletes an existing object by id
     /// </summary>
     /// <param name="id"></param>
-    /// <returns></returns>
     [HttpDelete("{id:int}")]
-    public IActionResult DeleteBike(int id)
+    [ProducesResponseType(StatusCodes.Status204NoContent)]
+    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
+    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status500InternalServerError)]
+    public ActionResult DeleteBike(int id)
     {
         try
         {
@@ -155,7 +203,10 @@ public class BikesController(IBikeService service, ILogger<BikesController> logg
             if (!result)
             {
                 logger.LogWarning("Bike with ID {BikeId} not found for deletion", id);
-                return NotFound(new { error = $"Bike with ID {id} not found." });
+                return Problem(
+                    title: "Not Found",
+                    detail: $"Bike with ID {id} not found.",
+                    statusCode: StatusCodes.Status404NotFound);
             }
 
             logger.LogInformation("Deleted bike with ID {BikeId}", id);
@@ -164,7 +215,10 @@ public class BikesController(IBikeService service, ILogger<BikesController> logg
         catch (Exception ex)
         {
             logger.LogError(ex, "Error deleting bike with ID {BikeId}", id);
-            return StatusCode(500, new { error = "An error occurred while deleting the bike." });
+            return Problem(
+                title: "Internal Server Error",
+                detail: "An error occurred while deleting the bike.",
+                statusCode: StatusCodes.Status500InternalServerError);
         }
     }
 }

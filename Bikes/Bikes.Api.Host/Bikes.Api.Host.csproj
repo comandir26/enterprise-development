@@ -7,11 +7,14 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="AutoMapper" Version="16.0.0" />
+    <PackageReference Include="AutoMapper.Extensions.Microsoft.DependencyInjection" Version="12.0.1" />
     <PackageReference Include="Swashbuckle.AspNetCore" Version="6.6.2" />
   </ItemGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\Bikes.Application\Bikes.Application.csproj" />
+    <ProjectReference Include="..\Bikes.Contracts\Bikes.Contracts.csproj" />
     <ProjectReference Include="..\Bikes.Infrastructure.InMemory\Bikes.Infrastructure.InMemory.csproj" />
   </ItemGroup>
 

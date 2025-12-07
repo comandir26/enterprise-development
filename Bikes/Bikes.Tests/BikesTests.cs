@@ -13,12 +13,19 @@ public class BikesTests(BikesFixture fixture) : IClassFixture<BikesFixture>
     [Fact]
     public void InformationAboutSportBikes()
     {
-        var expectedBikeIds = new List<int> { 2, 5, 8 };
+        var expectedSerialNumbers = new List<string>
+        {
+            "SPT202402001",  // Bike Id 2
+            "SPT202403001",  // Bike Id 5  
+            "SPT202305001"   // Bike Id 8
+        };
 
         var sportBikes = fixture.AnalyticsService.GetSportBikes();
-        var actualIds = sportBikes.Select(bike => bike.Id).ToList();
 
-        Assert.Equal(expectedBikeIds, actualIds);
+        Assert.Equal(3, sportBikes.Count);
+
+        var actualSerialNumbers = sportBikes.Select(bike => bike.SerialNumber).ToList();
+        Assert.Equal(expectedSerialNumbers, actualSerialNumbers);
     }
 
     /// <summary>
@@ -27,12 +34,21 @@ public class BikesTests(BikesFixture fixture) : IClassFixture<BikesFixture>
     [Fact]
     public void TopFiveModelsRentDurationIds()
     {
-        var expectedModelIds = new List<int> { 10, 1, 2, 5, 3 };
+        var expectedModelTypes = new List<BikeType>
+        {
+            BikeType.Mountain, // Model Id 10
+            BikeType.Mountain, // Model Id 1  
+            BikeType.Sport,    // Model Id 2
+            BikeType.Sport,    // Model Id 5
+            BikeType.City      // Model Id 3
+        };
 
         var topModels = fixture.AnalyticsService.GetTopFiveModelsByRentDuration();
-        var actualIds = topModels.Select(model => model.Id).ToList();
 
-        Assert.Equal(expectedModelIds, actualIds);
+        Assert.Equal(5, topModels.Count);
+
+        var actualModelTypes = topModels.Select(model => model.Type).ToList();
+        Assert.Equal(expectedModelTypes, actualModelTypes);
     }
 
     /// <summary>
@@ -41,12 +57,21 @@ public class BikesTests(BikesFixture fixture) : IClassFixture<BikesFixture>
     [Fact]
     public void TopFiveModelsProfit()
     {
-        var expectedModelIds = new List<int> { 10, 5, 2, 1, 3 };
+        var expectedModelTypes = new List<BikeType>
+        {
+            BikeType.Mountain, // Model Id 10
+            BikeType.Sport,    // Model Id 5
+            BikeType.Sport,    // Model Id 2
+            BikeType.Mountain, // Model Id 1
+            BikeType.City      // Model Id 3
+        };
 
         var topModels = fixture.AnalyticsService.GetTopFiveModelsByProfit();
-        var actualIds = topModels.Select(model => model.Id).ToList();
 
-        Assert.Equal(expectedModelIds, actualIds);
+        Assert.Equal(5, topModels.Count);
+
+        var actualModelTypes = topModels.Select(model => model.Type).ToList();
+        Assert.Equal(expectedModelTypes, actualModelTypes);
     }
 
     /// <summary>
@@ -59,11 +84,11 @@ public class BikesTests(BikesFixture fixture) : IClassFixture<BikesFixture>
         const int expectedMax = 5;
         const double expectedAvg = 2.95;
 
-        var (actualMin, actualMax, actualAvg) = fixture.AnalyticsService.GetRentalDurationStats();
+        var stats = fixture.AnalyticsService.GetRentalDurationStats();
 
-        Assert.Equal(expectedMin, actualMin);
-        Assert.Equal(expectedMax, actualMax);
-        Assert.Equal(expectedAvg, actualAvg);
+        Assert.Equal(expectedMin, stats.Min);
+        Assert.Equal(expectedMax, stats.Max);
+        Assert.Equal(expectedAvg, stats.Average);
     }
 
     /// <summary>
@@ -87,11 +112,18 @@ public class BikesTests(BikesFixture fixture) : IClassFixture<BikesFixture>
     [Fact]
     public void TopThreeRenters()
     {
-        var expectedTopRentersIds = new List<int> { 1, 2, 6 };
+        var expectedFullNames = new List<string>
+        {
+            "Иванов Иван Иванович",    // Renter Id 1
+            "Петров Петр Сергеевич",   // Renter Id 2
+            "Попов Денис Андреевич"    // Renter Id 6
+        };
 
         var topRenters = fixture.AnalyticsService.GetTopThreeRenters();
-        var actualTopRentersIds = topRenters.Select(renter => renter.Id).ToList();
 
-        Assert.Equal(expectedTopRentersIds, actualTopRentersIds);
+        Assert.Equal(3, topRenters.Count);
+
+        var actualFullNames = topRenters.Select(renter => renter.FullName).ToList();
+        Assert.Equal(expectedFullNames, actualFullNames);
     }
 }

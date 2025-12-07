@@ -1,4 +1,4 @@
-﻿using Bikes.Application.Dto;
+﻿using Bikes.Contracts.Dto;
 using Bikes.Application.Services;
 using Microsoft.AspNetCore.Mvc;
 
@@ -11,14 +11,16 @@ namespace Bikes.Api.Host.Controllers;
 /// <param name="logger"></param>
 [ApiController]
 [Route("api/[controller]")]
+[Produces("application/json")]
 public class RentsController(IRentService service, ILogger<RentsController> logger) : ControllerBase
 {
     /// <summary>
     /// Returns all existing objects
     /// </summary>
-    /// <returns></returns>
     [HttpGet]
-    public IActionResult GetAllRents()
+    [ProducesResponseType(typeof(List<RentDto>), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status500InternalServerError)]
+    public ActionResult<List<RentDto>> GetAllRents()
     {
         try
         {
@@ -30,7 +32,10 @@ public class RentsController(IRentService service, ILogger<RentsController> logg
         catch (Exception ex)
         {
             logger.LogError(ex, "Error getting all rents");
-            return StatusCode(500, new { error = "An error occurred while retrieving rents." });
+            return Problem(
+                title: "Internal Server Error",
+                detail: "An error occurred while retrieving rents.",
+                statusCode: StatusCodes.Status500InternalServerError);
         }
     }
 
@@ -38,9 +43,11 @@ public class RentsController(IRentService service, ILogger<RentsController> logg
     /// Returns object by id
     /// </summary>
     /// <param name="id"></param>
-    /// <returns></returns>
     [HttpGet("{id:int}")]
-    public IActionResult GetRent(int id)
+    [ProducesResponseType(typeof(RentDto), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
+    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status500InternalServerError)]
+    public ActionResult<RentDto> GetRent(int id)
     {
         try
         {
@@ -50,7 +57,10 @@ public class RentsController(IRentService service, ILogger<RentsController> logg
             if (rent == null)
             {
                 logger.LogWarning("Rent with ID {RentId} not found", id);
-                return NotFound(new { error = $"Rent with ID {id} not found." });
+                return Problem(
+                    title: "Not Found",
+                    detail: $"Rent with ID {id} not found.",
+                    statusCode: StatusCodes.Status404NotFound);
             }
 
             return Ok(rent);
@@ -58,7 +68,10 @@ public class RentsController(IRentService service, ILogger<RentsController> logg
         catch (Exception ex)
         {
             logger.LogError(ex, "Error getting rent with ID {RentId}", id);
-            return StatusCode(500, new { error = "An error occurred while retrieving the rent." });
+            return Problem(
+                title: "Internal Server Error",
+                detail: "An error occurred while retrieving the rent.",
+                statusCode: StatusCodes.Status500InternalServerError);
         }
     }
 
@@ -66,9 +79,11 @@ public class RentsController(IRentService service, ILogger<RentsController> logg
     /// Creates a new object
     /// </summary>
     /// <param name="rentDto"></param>
-    /// <returns></returns>
     [HttpPost]
-    public IActionResult CreateRent([FromBody] RentDto rentDto)
+    [ProducesResponseType(typeof(CreatedAtActionResult), StatusCodes.Status201Created)]
+    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status500InternalServerError)]
+    public ActionResult<CreatedAtActionResult> CreateRent([FromBody] RentDto rentDto)
     {
         try
         {
@@ -77,24 +92,38 @@ public class RentsController(IRentService service, ILogger<RentsController> logg
 
             if (!ModelState.IsValid)
             {
-                logger.LogWarning("Invalid rent data: {ModelErrors}", ModelState.Values.SelectMany(v => v.Errors));
-                return BadRequest(new { errors = ModelState.Values.SelectMany(v => v.Errors) });
+                logger.LogWarning("Invalid rent data: {ModelErrors}",
+                    ModelState.Values.SelectMany(v => v.Errors.Select(e => e.ErrorMessage)));
+
+                return ValidationProblem(
+                    title: "Validation Error",
+                    detail: "One or more validation errors occurred.",
+                    modelStateDictionary: ModelState);
             }
 
             var id = service.CreateRent(rentDto);
             logger.LogInformation("Created rent with ID {RentId}", id);
 
-            return CreatedAtAction(nameof(GetRent), new { id }, new { id, message = "Rent created successfully." });
+            return CreatedAtAction(
+                nameof(GetRent),
+                new { id },
+                new { id, message = "Rent created successfully." });
         }
         catch (ArgumentException ex)
         {
             logger.LogWarning(ex, "Error creating rent: {ErrorMessage}", ex.Message);
-            return BadRequest(new { error = ex.Message });
+            return Problem(
+                title: "Bad Request",
+                detail: ex.Message,
+                statusCode: StatusCodes.Status400BadRequest);
         }
         catch (Exception ex)
         {
             logger.LogError(ex, "Error creating rent");
-            return StatusCode(500, new { error = "An error occurred while creating the rent." });
+            return Problem(
+                title: "Internal Server Error",
+                detail: "An error occurred while creating the rent.",
+                statusCode: StatusCodes.Status500InternalServerError);
         }
     }
 
@@ -103,9 +132,12 @@ public class RentsController(IRentService service, ILogger<RentsController> logg
     /// </summary>
     /// <param name="id"></param>
     /// <param name="rentDto"></param>
-    /// <returns></returns>
     [HttpPut("{id:int}")]
-    public IActionResult UpdateRent(int id, [FromBody] RentDto rentDto)
+    [ProducesResponseType(typeof(RentDto), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
+    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status500InternalServerError)]
+    public ActionResult<RentDto> UpdateRent(int id, [FromBody] RentDto rentDto)
     {
         try
         {
@@ -113,28 +145,43 @@ public class RentsController(IRentService service, ILogger<RentsController> logg
 
             if (!ModelState.IsValid)
             {
-                return BadRequest(new { errors = ModelState.Values.SelectMany(v => v.Errors) });
+                logger.LogWarning("Invalid rent data for update: {ModelErrors}",
+                    ModelState.Values.SelectMany(v => v.Errors.Select(e => e.ErrorMessage)));
+
+                return ValidationProblem(
+                    title: "Validation Error",
+                    detail: "One or more validation errors occurred.",
+                    modelStateDictionary: ModelState);
             }
 
             var rent = service.UpdateRent(id, rentDto);
             if (rent == null)
             {
                 logger.LogWarning("Rent with ID {RentId} not found for update", id);
-                return NotFound(new { error = $"Rent with ID {id} not found." });
+                return Problem(
+                    title: "Not Found",
+                    detail: $"Rent with ID {id} not found.",
+                    statusCode: StatusCodes.Status404NotFound);
             }
 
             logger.LogInformation("Updated rent with ID {RentId}", id);
-            return Ok(new { message = "Rent updated successfully.", rent });
+            return Ok(rent);
         }
         catch (ArgumentException ex)
         {
             logger.LogWarning(ex, "Error updating rent: {ErrorMessage}", ex.Message);
-            return BadRequest(new { error = ex.Message });
+            return Problem(
+                title: "Bad Request",
+                detail: ex.Message,
+                statusCode: StatusCodes.Status400BadRequest);
         }
         catch (Exception ex)
         {
             logger.LogError(ex, "Error updating rent with ID {RentId}", id);
-            return StatusCode(500, new { error = "An error occurred while updating the rent." });
+            return Problem(
+                title: "Internal Server Error",
+                detail: "An error occurred while updating the rent.",
+                statusCode: StatusCodes.Status500InternalServerError);
         }
     }
 
@@ -142,9 +189,11 @@ public class RentsController(IRentService service, ILogger<RentsController> logg
     /// Deletes an existing object by id
     /// </summary>
     /// <param name="id"></param>
-    /// <returns></returns>
     [HttpDelete("{id:int}")]
-    public IActionResult DeleteRent(int id)
+    [ProducesResponseType(StatusCodes.Status204NoContent)]
+    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
+    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status500InternalServerError)]
+    public ActionResult DeleteRent(int id)
     {
         try
         {
@@ -154,7 +203,10 @@ public class RentsController(IRentService service, ILogger<RentsController> logg
             if (!result)
             {
                 logger.LogWarning("Rent with ID {RentId} not found for deletion", id);
-                return NotFound(new { error = $"Rent with ID {id} not found." });
+                return Problem(
+                    title: "Not Found",
+                    detail: $"Rent with ID {id} not found.",
+                    statusCode: StatusCodes.Status404NotFound);
             }
 
             logger.LogInformation("Deleted rent with ID {RentId}", id);
@@ -163,7 +215,10 @@ public class RentsController(IRentService service, ILogger<RentsController> logg
         catch (Exception ex)
         {
             logger.LogError(ex, "Error deleting rent with ID {RentId}", id);
-            return StatusCode(500, new { error = "An error occurred while deleting the rent." });
+            return Problem(
+                title: "Internal Server Error",
+                detail: "An error occurred while deleting the rent.",
+                statusCode: StatusCodes.Status500InternalServerError);
         }
     }
 }

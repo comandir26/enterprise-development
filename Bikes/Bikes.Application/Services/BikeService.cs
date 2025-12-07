@@ -1,4 +1,5 @@
-﻿using Bikes.Application.Dto;
+﻿using AutoMapper;
+using Bikes.Contracts.Dto;
 using Bikes.Domain.Models;
 using Bikes.Domain.Repositories;
 
@@ -7,42 +8,11 @@ namespace Bikes.Application.Services;
 /// <summary>
 /// A class that implements the interface of the BikeService class
 /// </summary>
-public class BikeService : IBikeService
+public class BikeService(
+    IRepository<Bike, int> bikeRepository,
+    IRepository<BikeModel, int> bikeModelRepository,
+    IMapper mapper) : IBikeService
 {
-    private readonly IRepository<Bike, int> _bikeRepository;
-    private readonly IRepository<BikeModel, int> _bikeModelRepository;
-
-    /// <summary>
-    /// The constructor that initializes repositories
-    /// </summary>
-    /// <param name="bikeRepository"></param>
-    /// <param name="bikeModelRepository"></param>
-    public BikeService(
-        IRepository<Bike, int> bikeRepository,
-        IRepository<BikeModel, int> bikeModelRepository)
-    {
-        _bikeRepository = bikeRepository;
-        _bikeModelRepository = bikeModelRepository;
-    }
-
-    /// <summary>
-    /// A method that maps a DTO object to a domain object
-    /// </summary>
-    /// <param name="dto"></param>
-    /// <param name="model"></param>
-    /// <param name="id"></param>
-    /// <returns></returns>
-    private static Bike MapToDomain(BikeDto dto, BikeModel model, int id = 0)
-    {
-        return new Bike
-        {
-            Id = id,
-            SerialNumber = dto.SerialNumber,
-            Color = dto.Color,
-            Model = model
-        };
-    }
-
     /// <summary>
     /// Creates a new object
     /// </summary>
@@ -50,26 +20,35 @@ public class BikeService : IBikeService
     /// <returns>ID of the created object</returns>
     public int CreateBike(BikeDto bikeDto)
     {
-        var model = _bikeModelRepository.Read(bikeDto.ModelId);
-        if (model == null)
-            throw new ArgumentException($"BikeModel with id {bikeDto.ModelId} not found");
+        var model = bikeModelRepository.Read(bikeDto.ModelId)
+            ?? throw new ArgumentException($"BikeModel with id {bikeDto.ModelId} not found");
 
-        var bike = MapToDomain(bikeDto, model);
-        return _bikeRepository.Create(bike);
+        var bike = mapper.Map<Bike>(bikeDto);
+        bike.Model = model;
+
+        return bikeRepository.Create(bike);
     }
 
     /// <summary>
     /// Returns all existing objects
     /// </summary>
     /// <returns>List of existing objects</returns>
-    public List<Bike> GetAllBikes() => _bikeRepository.ReadAll();
+    public List<BikeDto> GetAllBikes()
+    {
+        var bikes = bikeRepository.ReadAll();
+        return mapper.Map<List<BikeDto>>(bikes);
+    }
 
     /// <summary>
     /// Returns object by id
     /// </summary>
     /// <param name="id"></param>
     /// <returns></returns>
-    public Bike? GetBikeById(int id) => _bikeRepository.Read(id);
+    public BikeDto? GetBikeById(int id)
+    {
+        var bike = bikeRepository.Read(id);
+        return bike != null ? mapper.Map<BikeDto>(bike) : null;
+    }
 
     /// <summary>
     /// Updates an existing object
@@ -77,16 +56,20 @@ public class BikeService : IBikeService
     /// <param name="id">Id</param>
     /// <param name="bikeDto">DTO object</param>
     /// <returns>Object if exist</returns>
-    public Bike? UpdateBike(int id, BikeDto bikeDto)
+    public BikeDto? UpdateBike(int id, BikeDto bikeDto)
     {
-        var existingBike = _bikeRepository.Read(id);
+        var existingBike = bikeRepository.Read(id);
         if (existingBike == null) return null;
 
-        var model = _bikeModelRepository.Read(bikeDto.ModelId);
+        var model = bikeModelRepository.Read(bikeDto.ModelId);
         if (model == null) return null;
 
-        var updatedBike = MapToDomain(bikeDto, model, id);
-        return _bikeRepository.Update(id, updatedBike);
+        mapper.Map(bikeDto, existingBike);
+
+        existingBike.Model = model;
+
+        var updatedBike = bikeRepository.Update(id, existingBike);
+        return updatedBike != null ? mapper.Map<BikeDto>(updatedBike) : null;
     }
 
     /// <summary>
@@ -94,5 +77,5 @@ public class BikeService : IBikeService
     /// </summary>
     /// <param name="id"></param>
     /// <returns>True or false? result of deleting</returns>
-    public bool DeleteBike(int id) => _bikeRepository.Delete(id);
+    public bool DeleteBike(int id) => bikeRepository.Delete(id);
 }

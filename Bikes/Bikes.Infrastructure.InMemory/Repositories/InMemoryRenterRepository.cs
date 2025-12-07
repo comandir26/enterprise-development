@@ -9,7 +9,7 @@ namespace Bikes.Infrastructure.InMemory.Repositories;
 /// </summary>
 public class InMemoryRenterRepository : IRepository<Renter, int>
 {
-    private readonly List<Renter> _items = [];
+    private readonly List<Renter> _items;
 
     private int _currentId;
 

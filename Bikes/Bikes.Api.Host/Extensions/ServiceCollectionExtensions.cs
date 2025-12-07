@@ -16,6 +16,8 @@ public static class ServiceCollectionExtensions
     /// <returns></returns>
     public static IServiceCollection AddBikeRentalServices(this IServiceCollection services)
     {
+        services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
+
         services.AddSingleton<IRepository<Bikes.Domain.Models.Bike, int>, InMemoryBikeRepository>();
         services.AddSingleton<IRepository<Bikes.Domain.Models.BikeModel, int>, InMemoryBikeModelRepository>();
         services.AddSingleton<IRepository<Bikes.Domain.Models.Renter, int>, InMemoryRenterRepository>();

@@ -1,4 +1,5 @@
-﻿using Bikes.Application.Dto;
+﻿using AutoMapper;
+using Bikes.Contracts.Dto;
 using Bikes.Domain.Models;
 using Bikes.Domain.Repositories;
 
@@ -7,48 +8,12 @@ namespace Bikes.Application.Services;
 /// <summary>
 /// A class that implements the interface of the RentService class
 /// </summary>
-public class RentService : IRentService
+public class RentService(
+    IRepository<Rent, int> rentRepository,
+    IRepository<Bike, int> bikeRepository,
+    IRepository<Renter, int> renterRepository,
+    IMapper mapper) : IRentService
 {
-    private readonly IRepository<Rent, int> _rentRepository;
-    private readonly IRepository<Bike, int> _bikeRepository;
-    private readonly IRepository<Renter, int> _renterRepository;
-
-    /// <summary>
-    /// The constructor that initializes repositories
-    /// </summary>
-    /// <param name="rentRepository"></param>
-    /// <param name="bikeRepository"></param>
-    /// <param name="renterRepository"></param>
-    public RentService(
-        IRepository<Rent, int> rentRepository,
-        IRepository<Bike, int> bikeRepository,
-        IRepository<Renter, int> renterRepository)
-    {
-        _rentRepository = rentRepository;
-        _bikeRepository = bikeRepository;
-        _renterRepository = renterRepository;
-    }
-
-    /// <summary>
-    /// A method that maps a DTO object to a domain object
-    /// </summary>
-    /// <param name="dto"></param>
-    /// <param name="bike"></param>
-    /// <param name="renter"></param>
-    /// <param name="id"></param>
-    /// <returns></returns>
-    private static Rent MapToDomain(RentDto dto, Bike bike, Renter renter, int id = 0)
-    {
-        return new Rent
-        {
-            Id = id,
-            RentalStartTime = dto.RentalStartTime,
-            RentalDuration = dto.RentalDuration,
-            Bike = bike,       
-            Renter = renter    
-        };
-    }
-
     /// <summary>
     /// Creates a new object
     /// </summary>
@@ -57,30 +22,39 @@ public class RentService : IRentService
     /// <exception cref="ArgumentException"></exception>
     public int CreateRent(RentDto rentDto)
     {
-        var bike = _bikeRepository.Read(rentDto.BikeId);
-        if (bike == null)
-            throw new ArgumentException($"Bike with id {rentDto.BikeId} not found");
+        var bike = bikeRepository.Read(rentDto.BikeId)
+            ?? throw new ArgumentException($"Bike with id {rentDto.BikeId} not found");
 
-        var renter = _renterRepository.Read(rentDto.RenterId);
-        if (renter == null)
-            throw new ArgumentException($"Renter with id {rentDto.RenterId} not found");
+        var renter = renterRepository.Read(rentDto.RenterId)
+            ?? throw new ArgumentException($"Renter with id {rentDto.RenterId} not found");
 
-        var rent = MapToDomain(rentDto, bike, renter);
-        return _rentRepository.Create(rent);
+        var rent = mapper.Map<Rent>(rentDto);
+        rent.Bike = bike;
+        rent.Renter = renter;
+
+        return rentRepository.Create(rent);
     }
 
     /// <summary>
     /// Returns all existing objects
     /// </summary>
     /// <returns></returns>
-    public List<Rent> GetAllRents() => _rentRepository.ReadAll();
+    public List<RentDto> GetAllRents()
+    {
+        var rents = rentRepository.ReadAll();
+        return mapper.Map<List<RentDto>>(rents);
+    }
 
     /// <summary>
     /// Returns object by id
     /// </summary>
     /// <param name="id"></param>
     /// <returns></returns>
-    public Rent? GetRentById(int id) => _rentRepository.Read(id);
+    public RentDto? GetRentById(int id)
+    {
+        var rent = rentRepository.Read(id);
+        return rent != null ? mapper.Map<RentDto>(rent) : null;
+    }
 
     /// <summary>
     /// Updates an existing object
@@ -88,19 +62,24 @@ public class RentService : IRentService
     /// <param name="id"></param>
     /// <param name="rentDto"></param>
     /// <returns></returns>
-    public Rent? UpdateRent(int id, RentDto rentDto)
+    public RentDto? UpdateRent(int id, RentDto rentDto)
     {
-        var existingRent = _rentRepository.Read(id);
+        var existingRent = rentRepository.Read(id);
         if (existingRent == null) return null;
 
-        var bike = _bikeRepository.Read(rentDto.BikeId);
+        var bike = bikeRepository.Read(rentDto.BikeId);
         if (bike == null) return null;
 
-        var renter = _renterRepository.Read(rentDto.RenterId);
+        var renter = renterRepository.Read(rentDto.RenterId);
         if (renter == null) return null;
 
-        var updatedRent = MapToDomain(rentDto, bike, renter, id);
-        return _rentRepository.Update(id, updatedRent);
+        mapper.Map(rentDto, existingRent);
+
+        existingRent.Bike = bike;
+        existingRent.Renter = renter;
+
+        var updatedRent = rentRepository.Update(id, existingRent);
+        return updatedRent != null ? mapper.Map<RentDto>(updatedRent) : null;
     }
 
     /// <summary>
@@ -108,5 +87,5 @@ public class RentService : IRentService
     /// </summary>
     /// <param name="id"></param>
     /// <returns></returns>
-    public bool DeleteRent(int id) => _rentRepository.Delete(id);
+    public bool DeleteRent(int id) => rentRepository.Delete(id);
 }

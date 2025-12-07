@@ -1,4 +1,4 @@
-﻿namespace Bikes.Application.Dto;
+﻿namespace Bikes.Contracts.Dto;
 
 /// <summary>
 /// DTO class for the Renter class
