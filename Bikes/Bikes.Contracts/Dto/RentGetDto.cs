@@ -1,10 +1,17 @@
-﻿namespace Bikes.Contracts.Dto;
+﻿using Bikes.Domain.Models;
+
+namespace Bikes.Contracts.Dto;
 
 /// <summary>
-/// DTO class for the Rent class
+/// DTO get class for the Rent class
 /// </summary>
-public class RentDto
+public class RentGetDto
 {
+    /// <summary>
+    /// Rent's unique id
+    /// </summary>
+    public required int Id { get; set; }
+
     /// <summary>
     /// Rental start time
     /// </summary>
@@ -16,12 +23,12 @@ public class RentDto
     public required int RentalDuration { get; set; }
 
     /// <summary>
-    /// Renter's id
+    /// Renter
     /// </summary>
     public required int RenterId { get; set; }
 
     /// <summary>
-    /// Bike's id
+    /// Bike
     /// </summary>
     public required int BikeId { get; set; }
 }

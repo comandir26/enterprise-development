@@ -1,4 +1,5 @@
-﻿using Bikes.Application.Services;
+﻿using Bikes.Application.Interfaces;
+using Bikes.Application.Services;
 using Bikes.Domain.Repositories;
 using Bikes.Infrastructure.InMemory.Repositories;
 
@@ -18,10 +19,10 @@ public static class ServiceCollectionExtensions
     {
         services.AddAutoMapper(typeof(BikeService).Assembly);
 
-        services.AddSingleton<IRepository<Bikes.Domain.Models.Bike, int>, InMemoryBikeRepository>();
-        services.AddSingleton<IRepository<Bikes.Domain.Models.BikeModel, int>, InMemoryBikeModelRepository>();
-        services.AddSingleton<IRepository<Bikes.Domain.Models.Renter, int>, InMemoryRenterRepository>();
-        services.AddSingleton<IRepository<Bikes.Domain.Models.Rent, int>, InMemoryRentRepository>();
+        services.AddSingleton<IRepository<Domain.Models.Bike, int>, InMemoryBikeRepository>();
+        services.AddSingleton<IRepository<Domain.Models.BikeModel, int>, InMemoryBikeModelRepository>();
+        services.AddSingleton<IRepository<Domain.Models.Renter, int>, InMemoryRenterRepository>();
+        services.AddSingleton<IRepository<Domain.Models.Rent, int>, InMemoryRentRepository>();
 
         services.AddScoped<IBikeService, BikeService>();
         services.AddScoped<IBikeModelService, BikeModelService>();

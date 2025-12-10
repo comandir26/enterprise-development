@@ -1,6 +1,6 @@
 ﻿using Bikes.Contracts.Dto;
-using Bikes.Application.Services;
 using Microsoft.AspNetCore.Mvc;
+using Bikes.Application.Interfaces;
 
 namespace Bikes.Api.Host.Controllers;
 
@@ -18,9 +18,9 @@ public class RentersController(IRenterService service, ILogger<RentersController
     /// Returns all existing objects
     /// </summary>
     [HttpGet]
-    [ProducesResponseType(typeof(List<RenterDto>), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(List<RenterGetDto>), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status500InternalServerError)]
-    public ActionResult<List<RenterDto>> GetAllRenters()
+    public ActionResult<List<RenterGetDto>> GetAllRenters()
     {
         try
         {
@@ -44,10 +44,10 @@ public class RentersController(IRenterService service, ILogger<RentersController
     /// </summary>
     /// <param name="id"></param>
     [HttpGet("{id:int}")]
-    [ProducesResponseType(typeof(RenterDto), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(RenterGetDto), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status500InternalServerError)]
-    public ActionResult<RenterDto> GetRenter(int id)
+    public ActionResult<RenterGetDto> GetRenter(int id)
     {
         try
         {
@@ -83,7 +83,7 @@ public class RentersController(IRenterService service, ILogger<RentersController
     [ProducesResponseType(typeof(CreatedAtActionResult), StatusCodes.Status201Created)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status500InternalServerError)]
-    public ActionResult<CreatedAtActionResult> CreateRenter([FromBody] RenterDto renterDto)
+    public ActionResult<CreatedAtActionResult> CreateRenter([FromBody] RenterCreateUpdateDto renterDto)
     {
         try
         {
@@ -132,11 +132,11 @@ public class RentersController(IRenterService service, ILogger<RentersController
     /// <param name="id"></param>
     /// <param name="renterDto"></param>
     [HttpPut("{id:int}")]
-    [ProducesResponseType(typeof(RenterDto), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(RenterGetDto), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status500InternalServerError)]
-    public ActionResult<RenterDto> UpdateRenter(int id, [FromBody] RenterDto renterDto)
+    public ActionResult<RenterGetDto> UpdateRenter(int id, [FromBody] RenterCreateUpdateDto renterDto)
     {
         try
         {

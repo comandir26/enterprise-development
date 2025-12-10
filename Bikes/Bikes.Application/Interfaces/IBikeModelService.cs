@@ -1,7 +1,6 @@
 ﻿using Bikes.Contracts.Dto;
-using Bikes.Domain.Models;
 
-namespace Bikes.Application.Services;
+namespace Bikes.Application.Interfaces;
 
 /// <summary>
 /// Interface for the BikeModel service class
@@ -13,20 +12,20 @@ public interface IBikeModelService
     /// </summary>
     /// <param name="bikeModelDto">DTO object</param>
     /// <returns>ID of the created object</returns>
-    public int CreateBikeModel(BikeModelDto bikeModelDto);
+    public int CreateBikeModel(BikeModelCreateUpdateDto bikeModelDto);
 
     /// <summary>
     /// Returns all existing objects
     /// </summary>
     /// <returns>List of existing objects</returns>
-    public List<BikeModelDto> GetAllBikeModels();
+    public List<BikeModelGetDto> GetAllBikeModels();
 
     /// <summary>
     /// Returns object by id
     /// </summary>
     /// <param name="id"></param>
     /// <returns></returns>
-    public BikeModelDto? GetBikeModelById(int id);
+    public BikeModelGetDto? GetBikeModelById(int id);
 
     /// <summary>
     /// Updates an existing object
@@ -34,7 +33,7 @@ public interface IBikeModelService
     /// <param name="id">Id</param>
     /// <param name="bikeModelDto">DTO object</param>
     /// <returns>Object if exist</returns>
-    public BikeModelDto? UpdateBikeModel(int id, BikeModelDto bikeModelDto);
+    public BikeModelGetDto? UpdateBikeModel(int id, BikeModelCreateUpdateDto bikeModelDto);
 
     /// <summary>
     /// Deletes an existing object by id

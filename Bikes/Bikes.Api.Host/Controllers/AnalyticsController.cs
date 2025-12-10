@@ -1,4 +1,4 @@
-﻿using Bikes.Application.Services;
+﻿using Bikes.Application.Interfaces;
 using Bikes.Contracts.Dto;
 using Bikes.Domain.Models;
 using Microsoft.AspNetCore.Mvc;
@@ -21,9 +21,9 @@ public class AnalyticsController(
     /// A method that returns information about all sports bikes
     /// </summary>
     [HttpGet("sport-bikes")]
-    [ProducesResponseType(typeof(List<BikeDto>), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(List<BikeGetDto>), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status500InternalServerError)]
-    public ActionResult<List<BikeDto>> GetSportBikes()
+    public ActionResult<List<BikeGetDto>> GetSportBikes()
     {
         try
         {
@@ -46,9 +46,9 @@ public class AnalyticsController(
     /// A method that returns the top 5 bike models by rental duration
     /// </summary>
     [HttpGet("top-models/duration")]
-    [ProducesResponseType(typeof(List<BikeModelDto>), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(List<BikeModelGetDto>), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status500InternalServerError)]
-    public ActionResult<List<BikeModelDto>> GetTopModelsByDuration()
+    public ActionResult<List<BikeModelGetDto>> GetTopModelsByDuration()
     {
         try
         {
@@ -71,9 +71,9 @@ public class AnalyticsController(
     /// A method that returns the top 5 bike models in terms of rental income
     /// </summary>
     [HttpGet("top-models/profit")]
-    [ProducesResponseType(typeof(List<BikeModelDto>), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(List<BikeModelGetDto>), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status500InternalServerError)]
-    public ActionResult<List<BikeModelDto>> GetTopModelsByProfit()
+    public ActionResult<List<BikeModelGetDto>> GetTopModelsByProfit()
     {
         try
         {
@@ -148,9 +148,9 @@ public class AnalyticsController(
     /// A method that returns information about the customers who have rented bicycles the most times.
     /// </summary>
     [HttpGet("top-renters")]
-    [ProducesResponseType(typeof(List<RenterDto>), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(List<RenterGetDto>), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status500InternalServerError)]
-    public ActionResult<List<RenterDto>> GetTopRenters()
+    public ActionResult<List<RenterGetDto>> GetTopRenters()
     {
         try
         {

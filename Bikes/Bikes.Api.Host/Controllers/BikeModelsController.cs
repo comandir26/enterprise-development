@@ -1,6 +1,6 @@
 ﻿using Bikes.Contracts.Dto;
-using Bikes.Application.Services;
 using Microsoft.AspNetCore.Mvc;
+using Bikes.Application.Interfaces;
 
 namespace Bikes.Api.Host.Controllers;
 
@@ -18,9 +18,9 @@ public class BikeModelsController(IBikeModelService service, ILogger<BikeModelsC
     /// Returns all existing objects
     /// </summary>
     [HttpGet]
-    [ProducesResponseType(typeof(List<BikeModelDto>), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(List<BikeModelGetDto>), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status500InternalServerError)]
-    public ActionResult<List<BikeModelDto>> GetAllBikeModels()
+    public ActionResult<List<BikeModelGetDto>> GetAllBikeModels()
     {
         try
         {
@@ -44,10 +44,10 @@ public class BikeModelsController(IBikeModelService service, ILogger<BikeModelsC
     /// </summary>
     /// <param name="id"></param>
     [HttpGet("{id:int}")]
-    [ProducesResponseType(typeof(BikeModelDto), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(BikeModelGetDto), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status500InternalServerError)]
-    public ActionResult<BikeModelDto> GetBikeModel(int id)
+    public ActionResult<BikeModelGetDto> GetBikeModel(int id)
     {
         try
         {
@@ -83,7 +83,7 @@ public class BikeModelsController(IBikeModelService service, ILogger<BikeModelsC
     [ProducesResponseType(typeof(CreatedAtActionResult), StatusCodes.Status201Created)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status500InternalServerError)]
-    public ActionResult<CreatedAtActionResult> CreateBikeModel([FromBody] BikeModelDto bikeModelDto)
+    public ActionResult<CreatedAtActionResult> CreateBikeModel([FromBody] BikeModelCreateUpdateDto bikeModelDto)
     {
         try
         {
@@ -124,11 +124,11 @@ public class BikeModelsController(IBikeModelService service, ILogger<BikeModelsC
     /// <param name="id"></param>
     /// <param name="bikeModelDto"></param>
     [HttpPut("{id:int}")]
-    [ProducesResponseType(typeof(BikeModelDto), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(BikeModelGetDto), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status500InternalServerError)]
-    public ActionResult<BikeModelDto> UpdateBikeModel(int id, [FromBody] BikeModelDto bikeModelDto)
+    public ActionResult<BikeModelGetDto> UpdateBikeModel(int id, [FromBody] BikeModelCreateUpdateDto bikeModelDto)
     {
         try
         {

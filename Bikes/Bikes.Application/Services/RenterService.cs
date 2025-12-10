@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using Bikes.Application.Interfaces;
 using Bikes.Contracts.Dto;
 using Bikes.Domain.Models;
 using Bikes.Domain.Repositories;
@@ -17,7 +18,7 @@ public class RenterService(
     /// </summary>
     /// <param name="renterDto"></param>
     /// <returns></returns>
-    public int CreateRenter(RenterDto renterDto)
+    public int CreateRenter(RenterCreateUpdateDto renterDto)
     {
         var renter = mapper.Map<Renter>(renterDto);
         return renterRepository.Create(renter);
@@ -27,10 +28,10 @@ public class RenterService(
     /// Returns all existing objects
     /// </summary>
     /// <returns></returns>
-    public List<RenterDto> GetAllRenters()
+    public List<RenterGetDto> GetAllRenters()
     {
         var renters = renterRepository.ReadAll();
-        return mapper.Map<List<RenterDto>>(renters);
+        return mapper.Map<List<RenterGetDto>>(renters);
     }
 
     /// <summary>
@@ -38,10 +39,10 @@ public class RenterService(
     /// </summary>
     /// <param name="id"></param>
     /// <returns></returns>
-    public RenterDto? GetRenterById(int id)
+    public RenterGetDto? GetRenterById(int id)
     {
         var renter = renterRepository.Read(id);
-        return renter != null ? mapper.Map<RenterDto>(renter) : null;
+        return renter != null ? mapper.Map<RenterGetDto>(renter) : null;
     }
 
     /// <summary>
@@ -50,7 +51,7 @@ public class RenterService(
     /// <param name="id"></param>
     /// <param name="renterDto"></param>
     /// <returns></returns>
-    public RenterDto? UpdateRenter(int id, RenterDto renterDto)
+    public RenterGetDto? UpdateRenter(int id, RenterCreateUpdateDto renterDto)
     {
         var existingRenter = renterRepository.Read(id);
         if (existingRenter == null) return null;
@@ -58,7 +59,7 @@ public class RenterService(
         mapper.Map(renterDto, existingRenter);
 
         var updatedRenter = renterRepository.Update(id, existingRenter);
-        return updatedRenter != null ? mapper.Map<RenterDto>(updatedRenter) : null;
+        return updatedRenter != null ? mapper.Map<RenterGetDto>(updatedRenter) : null;
     }
 
     /// <summary>

@@ -3,10 +3,15 @@
 namespace Bikes.Contracts.Dto;
 
 /// <summary>
-/// DTO class for the BikeModel class
+/// DTO get class for the BikeModel class
 /// </summary>
-public class BikeModelDto
+public class BikeModelGetDto
 {
+    /// <summary>
+    /// Model's unique id
+    /// </summary>
+    public required int Id { get; set; }
+
     /// <summary>
     /// Model's type
     /// </summary>

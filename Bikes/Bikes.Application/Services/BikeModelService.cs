@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using Bikes.Application.Interfaces;
 using Bikes.Contracts.Dto;
 using Bikes.Domain.Models;
 using Bikes.Domain.Repositories;
@@ -17,7 +18,7 @@ public class BikeModelService(
     /// </summary>
     /// <param name="bikeModelDto">DTO object</param>
     /// <returns>ID of the created object</returns>
-    public int CreateBikeModel(BikeModelDto bikeModelDto)
+    public int CreateBikeModel(BikeModelCreateUpdateDto bikeModelDto)
     {
         var bikeModel = mapper.Map<BikeModel>(bikeModelDto);
 
@@ -28,15 +29,10 @@ public class BikeModelService(
     /// Returns all existing objects
     /// </summary>
     /// <returns>List of existing objects</returns>
-    public List<BikeModelDto> GetAllBikeModels()
+    public List<BikeModelGetDto> GetAllBikeModels()
     {
         var models = bikeModelRepository.ReadAll();
-
-        return models.Select(model =>
-        {
-            var dto = mapper.Map<BikeModelDto>(model);
-            return dto;
-        }).ToList();
+        return mapper.Map<List<BikeModelGetDto>>(models);
     }
 
     /// <summary>
@@ -44,12 +40,12 @@ public class BikeModelService(
     /// </summary>
     /// <param name="id"></param>
     /// <returns></returns>
-    public BikeModelDto? GetBikeModelById(int id)
+    public BikeModelGetDto? GetBikeModelById(int id)
     {
         var model = bikeModelRepository.Read(id);
         if (model == null) return null;
 
-        return mapper.Map<BikeModelDto>(model);
+        return mapper.Map<BikeModelGetDto>(model);
     }
 
     /// <summary>
@@ -58,7 +54,7 @@ public class BikeModelService(
     /// <param name="id">Id</param>
     /// <param name="bikeModelDto">DTO object</param>
     /// <returns>Object if exist</returns>
-    public BikeModelDto? UpdateBikeModel(int id, BikeModelDto bikeModelDto)
+    public BikeModelGetDto? UpdateBikeModel(int id, BikeModelCreateUpdateDto bikeModelDto)
     {
         var existingModel = bikeModelRepository.Read(id);
         if (existingModel == null) return null;
@@ -70,7 +66,7 @@ public class BikeModelService(
         var updatedModel = bikeModelRepository.Update(id, existingModel);
         if (updatedModel == null) return null;
 
-        return mapper.Map<BikeModelDto>(updatedModel);
+        return mapper.Map<BikeModelGetDto>(updatedModel);
     }
 
     /// <summary>

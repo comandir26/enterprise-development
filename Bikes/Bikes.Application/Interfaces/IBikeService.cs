@@ -1,45 +1,44 @@
 ﻿using Bikes.Contracts.Dto;
-using Bikes.Domain.Models;
 
-namespace Bikes.Application.Services;
+namespace Bikes.Application.Interfaces;
 
 /// <summary>
-/// Interface for the Renter service class
+/// Interface for the Bike service class
 /// </summary>
-public interface IRenterService
+public interface IBikeService
 {
     /// <summary>
     /// Creates a new object
     /// </summary>
-    /// <param name="renterDto">DTO object</param>
+    /// <param name="bikeDto">DTO object</param>
     /// <returns>ID of the created object</returns>
-    public int CreateRenter(RenterDto renterDto);
+    public int CreateBike(BikeCreateUpdateDto bikeDto);
 
     /// <summary>
     /// Returns all existing objects
     /// </summary>
     /// <returns>List of existing objects</returns>
-    public List<RenterDto> GetAllRenters();
+    public List<BikeGetDto> GetAllBikes();
 
     /// <summary>
     /// Returns object by id
     /// </summary>
     /// <param name="id"></param>
     /// <returns></returns>
-    public RenterDto? GetRenterById(int id);
+    public BikeGetDto? GetBikeById(int id);
 
     /// <summary>
     /// Updates an existing object
     /// </summary>
     /// <param name="id">Id</param>
-    /// <param name="renterDto">DTO object</param>
+    /// <param name="bikeDto">DTO object</param>
     /// <returns>Object if exist</returns>
-    public RenterDto? UpdateRenter(int id, RenterDto renterDto);
+    public BikeGetDto? UpdateBike(int id, BikeCreateUpdateDto bikeDto);
 
     /// <summary>
     /// Deletes an existing object by id
     /// </summary>
     /// <param name="id"></param>
     /// <returns>True or false? result of deleting</returns>
-    public bool DeleteRenter(int id);
+    public bool DeleteBike(int id);
 }

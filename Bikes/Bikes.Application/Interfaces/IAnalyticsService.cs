@@ -1,7 +1,7 @@
 ﻿using Bikes.Contracts.Dto;
 using Bikes.Domain.Models;
 
-namespace Bikes.Application.Services;
+namespace Bikes.Application.Interfaces;
 
 /// <summary>
 /// Interface for the Analytics service class
@@ -11,17 +11,17 @@ public interface IAnalyticsService
     /// <summary>
     /// A method that returns information about all sports bikes
     /// </summary>
-    public List<BikeDto> GetSportBikes();
+    public List<BikeGetDto> GetSportBikes();
 
     /// <summary>
     /// A method that returns the top 5 bike models by rental duration
     /// </summary>
-    public List<BikeModelDto> GetTopFiveModelsByRentDuration();
+    public List<BikeModelGetDto> GetTopFiveModelsByRentDuration();
 
     /// <summary>
     /// A method that returns the top 5 bike models in terms of rental income
     /// </summary>
-    public List<BikeModelDto> GetTopFiveModelsByProfit();
+    public List<BikeModelGetDto> GetTopFiveModelsByProfit();
 
     /// <summary>
     /// A method that returns information about the minimum, maximum, and average bike rental time.
@@ -36,5 +36,5 @@ public interface IAnalyticsService
     /// <summary>
     /// A method that returns information about the customers who have rented bicycles the most times.
     /// </summary>
-    public List<RenterDto> GetTopThreeRenters();
+    public List<RenterGetDto> GetTopThreeRenters();
 }

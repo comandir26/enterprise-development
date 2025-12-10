@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using Bikes.Application.Interfaces;
 using Bikes.Contracts.Dto;
 using Bikes.Domain.Models;
 using Bikes.Domain.Repositories;
@@ -20,7 +21,7 @@ public class RentService(
     /// <param name="rentDto"></param>
     /// <returns></returns>
     /// <exception cref="ArgumentException"></exception>
-    public int CreateRent(RentDto rentDto)
+    public int CreateRent(RentCreateUpdateDto rentDto)
     {
         var bike = bikeRepository.Read(rentDto.BikeId)
             ?? throw new ArgumentException($"Bike with id {rentDto.BikeId} not found");
@@ -39,10 +40,10 @@ public class RentService(
     /// Returns all existing objects
     /// </summary>
     /// <returns></returns>
-    public List<RentDto> GetAllRents()
+    public List<RentGetDto> GetAllRents()
     {
         var rents = rentRepository.ReadAll();
-        return mapper.Map<List<RentDto>>(rents);
+        return mapper.Map<List<RentGetDto>>(rents);
     }
 
     /// <summary>
@@ -50,10 +51,10 @@ public class RentService(
     /// </summary>
     /// <param name="id"></param>
     /// <returns></returns>
-    public RentDto? GetRentById(int id)
+    public RentGetDto? GetRentById(int id)
     {
         var rent = rentRepository.Read(id);
-        return rent != null ? mapper.Map<RentDto>(rent) : null;
+        return rent != null ? mapper.Map<RentGetDto>(rent) : null;
     }
 
     /// <summary>
@@ -62,7 +63,7 @@ public class RentService(
     /// <param name="id"></param>
     /// <param name="rentDto"></param>
     /// <returns></returns>
-    public RentDto? UpdateRent(int id, RentDto rentDto)
+    public RentGetDto? UpdateRent(int id, RentCreateUpdateDto rentDto)
     {
         var existingRent = rentRepository.Read(id);
         if (existingRent == null) return null;
@@ -79,7 +80,7 @@ public class RentService(
         existingRent.Renter = renter;
 
         var updatedRent = rentRepository.Update(id, existingRent);
-        return updatedRent != null ? mapper.Map<RentDto>(updatedRent) : null;
+        return updatedRent != null ? mapper.Map<RentGetDto>(updatedRent) : null;
     }
 
     /// <summary>

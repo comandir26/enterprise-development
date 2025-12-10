@@ -40,7 +40,7 @@ public class InMemoryRenterRepository : IRepository<Renter, int>
     /// <returns>List of existing objects</returns>
     public List<Renter> ReadAll()
     {
-        return _items;
+        return [.. _items];
     }
 
     /// <summary>

@@ -8,9 +8,16 @@ public class MappingProfile : Profile
 {
     public MappingProfile()
     {
-        CreateMap<Renter, RenterDto>().ReverseMap();
-        CreateMap<Bike, BikeDto>().ReverseMap();
-        CreateMap<BikeModel, BikeModelDto>().ReverseMap();
-        CreateMap<Rent, RentDto>().ReverseMap();
+        CreateMap<Bike, BikeGetDto>();
+        CreateMap<BikeCreateUpdateDto, Bike>();
+
+        CreateMap<BikeModel, BikeModelGetDto>();
+        CreateMap<BikeModelCreateUpdateDto, BikeModel>();
+
+        CreateMap<Renter, RenterGetDto>();
+        CreateMap<RenterCreateUpdateDto, Renter>();
+
+        CreateMap<Rent, RentGetDto>();
+        CreateMap<RentCreateUpdateDto, Rent>();
     }
 }

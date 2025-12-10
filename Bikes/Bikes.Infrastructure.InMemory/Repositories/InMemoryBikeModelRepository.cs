@@ -40,7 +40,7 @@ public class InMemoryBikeModelRepository : IRepository<BikeModel, int>
     /// <returns>List of existing objects</returns>
     public List<BikeModel> ReadAll()
     {
-        return _items;
+        return [.. _items];
     }
 
     /// <summary>

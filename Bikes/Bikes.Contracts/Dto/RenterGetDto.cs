@@ -1,10 +1,15 @@
 ﻿namespace Bikes.Contracts.Dto;
 
 /// <summary>
-/// DTO class for the Renter class
+/// DTO get class for the Renter class
 /// </summary>
-public class RenterDto
+public class RenterGetDto
 {
+    /// <summary>
+    /// Renter's unique id
+    /// </summary>
+    public required int Id { get; set; }
+
     /// <summary>
     /// Renter's full name
     /// </summary>

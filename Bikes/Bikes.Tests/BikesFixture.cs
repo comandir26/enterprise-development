@@ -1,4 +1,5 @@
-﻿using Bikes.Application.Services;
+﻿using Bikes.Application.Interfaces;
+using Bikes.Application.Services;
 using Bikes.Domain.Repositories;
 using Bikes.Infrastructure.InMemory.Repositories;
 

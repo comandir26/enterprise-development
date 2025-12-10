@@ -1,4 +1,6 @@
-﻿using Bikes.Contracts.Dto;
+﻿using AutoMapper;
+using Bikes.Application.Interfaces;
+using Bikes.Contracts.Dto;
 using Bikes.Domain.Models;
 using Bikes.Domain.Repositories;
 
@@ -11,85 +13,59 @@ public class AnalyticsService(
     IRepository<Bike, int> bikeRepository,
     IRepository<BikeModel, int> bikeModelRepository,
     IRepository<Rent, int> rentRepository,
-    IRepository<Renter, int> renterRepository) : IAnalyticsService
+    IRepository<Renter, int> renterRepository,
+    IMapper mapper) : IAnalyticsService
 {
     /// <summary>
     /// A method that returns information about all sports bikes
     /// </summary>
-    public List<BikeDto> GetSportBikes()
+    public List<BikeGetDto> GetSportBikes()
     {
-        return [.. bikeRepository.ReadAll()
+        var sportBikes = bikeRepository.ReadAll()
             .Where(bike => bike.Model.Type == BikeType.Sport)
-            .Select(bike => new BikeDto
-            {
-                SerialNumber = bike.SerialNumber,
-                Color = bike.Color,
-                ModelId = bike.Model.Id
-            })];
+            .ToList();
+
+        return mapper.Map<List<BikeGetDto>>(sportBikes);
     }
 
     /// <summary>
     /// A method that returns the top 5 bike models by rental duration
     /// </summary>
-    public List<BikeModelDto> GetTopFiveModelsByRentDuration()
+    public List<BikeModelGetDto> GetTopFiveModelsByRentDuration()
     {
-        var rents = rentRepository.ReadAll();
-        var models = bikeModelRepository.ReadAll();
-
-        return [.. rents
-            .GroupBy(rent => rent.Bike.Model.Id)
+        var topModels = rentRepository.ReadAll()
+            .GroupBy(rent => rent.Bike.Model) 
             .Select(group => new
             {
-                ModelId = group.Key,
+                Model = group.Key,
                 TotalDuration = group.Sum(rent => rent.RentalDuration)
             })
             .OrderByDescending(x => x.TotalDuration)
             .Take(5)
-            .Join(models,
-                  x => x.ModelId,
-                  model => model.Id,
-                  (x, model) => new BikeModelDto
-                  {
-                      Type = model.Type,
-                      WheelSize = model.WheelSize,
-                      MaxPassengerWeight = model.MaxPassengerWeight,
-                      Weight = model.Weight,
-                      BrakeType = model.BrakeType,
-                      Year = model.Year,
-                      RentPrice = model.RentPrice
-                  })];
+            .Select(x => x.Model)
+            .ToList();
+
+        return mapper.Map<List<BikeModelGetDto>>(topModels);
     }
 
     /// <summary>
     /// A method that returns the top 5 bike models in terms of rental income
     /// </summary>
-    public List<BikeModelDto> GetTopFiveModelsByProfit()
+    public List<BikeModelGetDto> GetTopFiveModelsByProfit()
     {
-        var rents = rentRepository.ReadAll();
-        var models = bikeModelRepository.ReadAll();
-
-        return [.. rents
-            .GroupBy(rent => rent.Bike.Model.Id)
+        var topModels = rentRepository.ReadAll()
+            .GroupBy(rent => rent.Bike.Model)
             .Select(group => new
             {
-                ModelId = group.Key,
+                Model = group.Key,
                 TotalProfit = group.Sum(rent => rent.RentalDuration * rent.Bike.Model.RentPrice)
             })
             .OrderByDescending(x => x.TotalProfit)
             .Take(5)
-            .Join(models,
-                  x => x.ModelId,
-                  model => model.Id,
-                  (x, model) => new BikeModelDto
-                  {
-                      Type = model.Type,
-                      WheelSize = model.WheelSize,
-                      MaxPassengerWeight = model.MaxPassengerWeight,
-                      Weight = model.Weight,
-                      BrakeType = model.BrakeType,
-                      Year = model.Year,
-                      RentPrice = model.RentPrice
-                  })];
+            .Select(x => x.Model)
+            .ToList();
+
+        return mapper.Map<List<BikeModelGetDto>>(topModels);
     }
 
     /// <summary>
@@ -97,8 +73,9 @@ public class AnalyticsService(
     /// </summary>
     public RentalDurationStatsDto GetRentalDurationStats()
     {
-        List<int> durations = [.. rentRepository.ReadAll()
-            .Select(rent => rent.RentalDuration)];
+        var durations = rentRepository.ReadAll()
+            .Select(rent => rent.RentalDuration)
+            .ToList();
 
         return new RentalDurationStatsDto
         {
@@ -124,11 +101,11 @@ public class AnalyticsService(
     /// <summary>
     /// A method that returns information about the customers who have rented bicycles the most times.
     /// </summary>
-    public List<RenterDto> GetTopThreeRenters()
+    public List<RenterGetDto> GetTopThreeRenters()
     {
         var renters = renterRepository.ReadAll();
 
-        return [.. rentRepository.ReadAll()
+        var topRenters = rentRepository.ReadAll()
             .GroupBy(rent => rent.Renter.Id)
             .Select(group => new
             {
@@ -140,10 +117,9 @@ public class AnalyticsService(
             .Join(renters,
                   x => x.RenterId,
                   renter => renter.Id,
-                  (x, renter) => new RenterDto
-                  {
-                      FullName = renter.FullName,
-                      Number = renter.Number
-                  })];
+                  (x, renter) => renter)
+            .ToList();
+
+        return mapper.Map<List<RenterGetDto>>(topRenters);
     }
 }

@@ -1,9 +1,9 @@
 ﻿namespace Bikes.Contracts.Dto;
 
 /// <summary>
-/// DTO class for the Bike class
+/// DTO create/update class for the Bike class
 /// </summary>
-public class BikeDto
+public class BikeCreateUpdateDto
 {
     /// <summary>
     /// Bike's serial number

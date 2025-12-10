@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using Bikes.Application.Interfaces;
 using Bikes.Contracts.Dto;
 using Bikes.Domain.Models;
 using Bikes.Domain.Repositories;
@@ -18,7 +19,7 @@ public class BikeService(
     /// </summary>
     /// <param name="bikeDto">DTO object</param>
     /// <returns>ID of the created object</returns>
-    public int CreateBike(BikeDto bikeDto)
+    public int CreateBike(BikeCreateUpdateDto bikeDto)
     {
         var model = bikeModelRepository.Read(bikeDto.ModelId)
             ?? throw new ArgumentException($"BikeModel with id {bikeDto.ModelId} not found");
@@ -33,10 +34,10 @@ public class BikeService(
     /// Returns all existing objects
     /// </summary>
     /// <returns>List of existing objects</returns>
-    public List<BikeDto> GetAllBikes()
+    public List<BikeGetDto> GetAllBikes()
     {
         var bikes = bikeRepository.ReadAll();
-        return mapper.Map<List<BikeDto>>(bikes);
+        return mapper.Map<List<BikeGetDto>>(bikes);
     }
 
     /// <summary>
@@ -44,10 +45,10 @@ public class BikeService(
     /// </summary>
     /// <param name="id"></param>
     /// <returns></returns>
-    public BikeDto? GetBikeById(int id)
+    public BikeGetDto? GetBikeById(int id)
     {
         var bike = bikeRepository.Read(id);
-        return bike != null ? mapper.Map<BikeDto>(bike) : null;
+        return bike != null ? mapper.Map<BikeGetDto>(bike) : null;
     }
 
     /// <summary>
@@ -56,7 +57,7 @@ public class BikeService(
     /// <param name="id">Id</param>
     /// <param name="bikeDto">DTO object</param>
     /// <returns>Object if exist</returns>
-    public BikeDto? UpdateBike(int id, BikeDto bikeDto)
+    public BikeGetDto? UpdateBike(int id, BikeCreateUpdateDto bikeDto)
     {
         var existingBike = bikeRepository.Read(id);
         if (existingBike == null) return null;
@@ -69,7 +70,7 @@ public class BikeService(
         existingBike.Model = model;
 
         var updatedBike = bikeRepository.Update(id, existingBike);
-        return updatedBike != null ? mapper.Map<BikeDto>(updatedBike) : null;
+        return updatedBike != null ? mapper.Map<BikeGetDto>(updatedBike) : null;
     }
 
     /// <summary>
