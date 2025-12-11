@@ -18,11 +18,14 @@ public class BikeModelService(
     /// </summary>
     /// <param name="bikeModelDto">DTO object</param>
     /// <returns>ID of the created object</returns>
-    public int CreateBikeModel(BikeModelCreateUpdateDto bikeModelDto)
+    public BikeModelGetDto CreateBikeModel(BikeModelCreateUpdateDto bikeModelDto)
     {
         var bikeModel = mapper.Map<BikeModel>(bikeModelDto);
 
-        return bikeModelRepository.Create(bikeModel);
+        var id = bikeModelRepository.Create(bikeModel);
+        var createdModel = bikeModelRepository.Read(id);
+
+        return mapper.Map<BikeModelGetDto>(createdModel);
     }
 
     /// <summary>

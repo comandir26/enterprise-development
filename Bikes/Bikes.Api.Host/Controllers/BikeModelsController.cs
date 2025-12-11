@@ -100,24 +100,23 @@ public class BikeModelsController(IBikeModelService service, ILogger<BikeModelsC
                     modelStateDictionary: ModelState);
             }
 
-            var id = service.CreateBikeModel(bikeModelDto);
-            logger.LogInformation("Created bike model with ID {ModelId}", id);
-
-            var createdModel = service.GetBikeModelById(id);
+            var createdModel = service.CreateBikeModel(bikeModelDto);
 
             if (createdModel == null)
             {
-                logger.LogError("Failed to retrieve created bike model with ID {ModelId}", id);
+                logger.LogError("Failed to create bike model");
                 return Problem(
                     title: "Internal Server Error",
-                    detail: "Bike model was created but cannot be retrieved.",
+                    detail: "Failed to create bike model.",
                     statusCode: StatusCodes.Status500InternalServerError);
             }
 
+            logger.LogInformation("Created bike model with ID {ModelId}", createdModel.Id);
+
             return CreatedAtAction(
                 nameof(GetBikeModel),
-                new { id },
-                createdModel); 
+                new { id = createdModel.Id },
+                createdModel);
         }
         catch (Exception ex)
         {

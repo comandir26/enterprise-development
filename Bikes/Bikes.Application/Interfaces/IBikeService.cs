@@ -12,7 +12,7 @@ public interface IBikeService
     /// </summary>
     /// <param name="bikeDto">DTO object</param>
     /// <returns>ID of the created object</returns>
-    public int CreateBike(BikeCreateUpdateDto bikeDto);
+    public BikeGetDto CreateBike(BikeCreateUpdateDto bikeDto);
 
     /// <summary>
     /// Returns all existing objects

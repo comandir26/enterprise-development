@@ -11,8 +11,8 @@ public interface IBikeModelService
     /// Creates a new object
     /// </summary>
     /// <param name="bikeModelDto">DTO object</param>
-    /// <returns>ID of the created object</returns>
-    public int CreateBikeModel(BikeModelCreateUpdateDto bikeModelDto);
+    /// <returns>Created object</returns>
+    public BikeModelGetDto CreateBikeModel(BikeModelCreateUpdateDto bikeModelDto);
 
     /// <summary>
     /// Returns all existing objects

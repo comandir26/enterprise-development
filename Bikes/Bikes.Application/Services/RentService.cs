@@ -18,10 +18,10 @@ public class RentService(
     /// <summary>
     /// Creates a new object
     /// </summary>
-    /// <param name="rentDto"></param>
-    /// <returns></returns>
+    /// <param name="rentDto">DTO object</param>
+    /// <returns>Created object DTO</returns>
     /// <exception cref="ArgumentException"></exception>
-    public int CreateRent(RentCreateUpdateDto rentDto)
+    public RentGetDto CreateRent(RentCreateUpdateDto rentDto)
     {
         var bike = bikeRepository.Read(rentDto.BikeId)
             ?? throw new ArgumentException($"Bike with id {rentDto.BikeId} not found");
@@ -33,7 +33,10 @@ public class RentService(
         rent.Bike = bike;
         rent.Renter = renter;
 
-        return rentRepository.Create(rent);
+        var id = rentRepository.Create(rent);
+        var createdRent = rentRepository.Read(id);
+
+        return mapper.Map<RentGetDto>(createdRent);
     }
 
     /// <summary>

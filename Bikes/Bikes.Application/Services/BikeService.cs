@@ -19,7 +19,7 @@ public class BikeService(
     /// </summary>
     /// <param name="bikeDto">DTO object</param>
     /// <returns>ID of the created object</returns>
-    public int CreateBike(BikeCreateUpdateDto bikeDto)
+    public BikeGetDto CreateBike(BikeCreateUpdateDto bikeDto)
     {
         var model = bikeModelRepository.Read(bikeDto.ModelId)
             ?? throw new ArgumentException($"BikeModel with id {bikeDto.ModelId} not found");
@@ -27,7 +27,11 @@ public class BikeService(
         var bike = mapper.Map<Bike>(bikeDto);
         bike.Model = model;
 
-        return bikeRepository.Create(bike);
+        var id = bikeRepository.Create(bike);
+
+        var createdBike = bikeRepository.Read(id);
+
+        return mapper.Map<BikeGetDto>(createdBike);
     }
 
     /// <summary>

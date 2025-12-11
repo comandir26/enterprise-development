@@ -12,7 +12,7 @@ public interface IRenterService
     /// </summary>
     /// <param name="renterDto">DTO object</param>
     /// <returns>ID of the created object</returns>
-    public int CreateRenter(RenterCreateUpdateDto renterDto);
+    public RenterGetDto CreateRenter(RenterCreateUpdateDto renterDto);
 
     /// <summary>
     /// Returns all existing objects

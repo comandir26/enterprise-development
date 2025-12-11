@@ -18,10 +18,14 @@ public class RenterService(
     /// </summary>
     /// <param name="renterDto"></param>
     /// <returns></returns>
-    public int CreateRenter(RenterCreateUpdateDto renterDto)
+    public RenterGetDto CreateRenter(RenterCreateUpdateDto renterDto)
     {
         var renter = mapper.Map<Renter>(renterDto);
-        return renterRepository.Create(renter);
+
+        var id = renterRepository.Create(renter);
+        var createdRenter = renterRepository.Read(id);
+
+        return mapper.Map<RenterGetDto>(createdRenter);
     }
 
     /// <summary>

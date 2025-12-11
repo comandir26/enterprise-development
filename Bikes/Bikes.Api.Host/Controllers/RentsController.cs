@@ -101,23 +101,22 @@ public class RentsController(IRentService service, ILogger<RentsController> logg
                     modelStateDictionary: ModelState);
             }
 
-            var id = service.CreateRent(rentDto);
-            logger.LogInformation("Created rent with ID {RentId}", id);
-
-            var createdRent = service.GetRentById(id);
+            var createdRent = service.CreateRent(rentDto);
 
             if (createdRent == null)
             {
-                logger.LogError("Failed to retrieve created rent with ID {RentId}", id);
+                logger.LogError("Failed to create rent");
                 return Problem(
                     title: "Internal Server Error",
-                    detail: "Rent was created but cannot be retrieved.",
+                    detail: "Failed to create rent.",
                     statusCode: StatusCodes.Status500InternalServerError);
             }
 
+            logger.LogInformation("Created rent with ID {RentId}", createdRent.Id);
+
             return CreatedAtAction(
                 nameof(GetRent),
-                new { id },
+                new { id = createdRent.Id },
                 createdRent);
         }
         catch (ArgumentException ex)

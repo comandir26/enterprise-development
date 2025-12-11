@@ -12,7 +12,7 @@ public interface IRentService
     /// </summary>
     /// <param name="rentDto">DTO object</param>
     /// <returns>ID of the created object</returns>
-    public int CreateRent(RentCreateUpdateDto rentDto);
+    public RentGetDto CreateRent(RentCreateUpdateDto rentDto);
 
     /// <summary>
     /// Returns all existing objects

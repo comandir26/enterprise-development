@@ -101,23 +101,22 @@ public class BikesController(IBikeService service, ILogger<BikesController> logg
                     modelStateDictionary: ModelState);
             }
 
-            var id = service.CreateBike(bikeDto);
-            logger.LogInformation("Created bike with ID {BikeId}", id);
-
-            var createdBike = service.GetBikeById(id);
+            var createdBike = service.CreateBike(bikeDto);
 
             if (createdBike == null)
             {
-                logger.LogError("Failed to retrieve created bike with ID {BikeId}", id);
+                logger.LogError("Failed to create bike");
                 return Problem(
                     title: "Internal Server Error",
-                    detail: "Bike was created but cannot be retrieved.",
+                    detail: "Failed to create bike.",
                     statusCode: StatusCodes.Status500InternalServerError);
             }
 
+            logger.LogInformation("Created bike with ID {BikeId}", createdBike.Id);
+
             return CreatedAtAction(
                 nameof(GetBike),
-                new { id },
+                new { id = createdBike.Id },
                 createdBike);
         }
         catch (ArgumentException ex)
