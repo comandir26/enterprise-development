@@ -32,6 +32,6 @@ public class BikesFixture
 
         _mapper = configuration.CreateMapper();
 
-        AnalyticsService = new AnalyticsService(bikeRepo, modelRepo, rentRepo, renterRepo, _mapper);
+        AnalyticsService = new AnalyticsService(bikeRepo, rentRepo, renterRepo, _mapper);
     }
 }

@@ -40,7 +40,7 @@ public class BikeModelGetDto
     /// <summary>
     /// Model's production year
     /// </summary>
-    public required string Year { get; set; }
+    public required int Year { get; set; }
 
     /// <summary>
     /// The price of an hour of rent

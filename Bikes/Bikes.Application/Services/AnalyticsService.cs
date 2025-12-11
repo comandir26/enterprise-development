@@ -11,7 +11,6 @@ namespace Bikes.Application.Services;
 /// </summary>
 public class AnalyticsService(
     IRepository<Bike, int> bikeRepository,
-    IRepository<BikeModel, int> bikeModelRepository,
     IRepository<Rent, int> rentRepository,
     IRepository<Renter, int> renterRepository,
     IMapper mapper) : IAnalyticsService

@@ -1,6 +1,4 @@
-﻿using Bikes.Domain.Models;
-
-namespace Bikes.Contracts.Dto;
+﻿namespace Bikes.Contracts.Dto;
 
 /// <summary>
 /// DTO get class for the Rent class

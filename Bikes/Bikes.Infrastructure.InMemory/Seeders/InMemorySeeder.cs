@@ -14,16 +14,16 @@ public static class InMemorySeeder
     {
         return
         [
-            new() { Id = 1, Type = BikeType.Mountain, WheelSize = 29, MaxPassengerWeight = 120, Weight = 14, BrakeType = "Дисковые гидравлические", Year = "2023", RentPrice = 700 },
-            new() { Id = 2, Type = BikeType.Sport, WheelSize = 27, MaxPassengerWeight = 110, Weight = 11, BrakeType = "Ободные v-brake", Year = "2024", RentPrice = 850 },
-            new() { Id = 3, Type = BikeType.City, WheelSize = 26, MaxPassengerWeight = 130, Weight = 16, BrakeType = "Дисковые механические", Year = "2022", RentPrice = 500 },
-            new() { Id = 4, Type = BikeType.Mountain, WheelSize = 26, MaxPassengerWeight = 125, Weight = 15, BrakeType = "Дисковые гидравлические", Year = "2023", RentPrice = 750 },
-            new() { Id = 5, Type = BikeType.Sport, WheelSize = 26, MaxPassengerWeight = 115, Weight = 12, BrakeType = "Ободные карбоновые", Year = "2024", RentPrice = 900 },
-            new() { Id = 6, Type = BikeType.City, WheelSize = 27, MaxPassengerWeight = 135, Weight = 17, BrakeType = "Дисковые механические", Year = "2023", RentPrice = 550 },
-            new() { Id = 7, Type = BikeType.Mountain, WheelSize = 29, MaxPassengerWeight = 120, Weight = 13, BrakeType = "Дисковые гидравлические", Year = "2024", RentPrice = 800 },
-            new() { Id = 8, Type = BikeType.Sport, WheelSize = 27, MaxPassengerWeight = 110, Weight = 10, BrakeType = "Ободные v-brake", Year = "2023", RentPrice = 950 },
-            new() { Id = 9, Type = BikeType.City, WheelSize = 26, MaxPassengerWeight = 140, Weight = 18, BrakeType = "Дисковые механические", Year = "2022", RentPrice = 600 },
-            new() { Id = 10, Type = BikeType.Mountain, WheelSize = 26, MaxPassengerWeight = 130, Weight = 14, BrakeType = "Дисковые гидравлические", Year = "2024", RentPrice = 650 }
+            new() { Id = 1, Type = BikeType.Mountain, WheelSize = 29, MaxPassengerWeight = 120, Weight = 14, BrakeType = "Дисковые гидравлические", Year = 2023, RentPrice = 700 },
+            new() { Id = 2, Type = BikeType.Sport, WheelSize = 27, MaxPassengerWeight = 110, Weight = 11, BrakeType = "Ободные v-brake", Year = 2024, RentPrice = 850 },
+            new() { Id = 3, Type = BikeType.City, WheelSize = 26, MaxPassengerWeight = 130, Weight = 16, BrakeType = "Дисковые механические", Year = 2022, RentPrice = 500 },
+            new() { Id = 4, Type = BikeType.Mountain, WheelSize = 26, MaxPassengerWeight = 125, Weight = 15, BrakeType = "Дисковые гидравлические", Year = 2023, RentPrice = 750 },
+            new() { Id = 5, Type = BikeType.Sport, WheelSize = 26, MaxPassengerWeight = 115, Weight = 12, BrakeType = "Ободные карбоновые", Year = 2024, RentPrice = 900 },
+            new() { Id = 6, Type = BikeType.City, WheelSize = 27, MaxPassengerWeight = 135, Weight = 17, BrakeType = "Дисковые механические", Year = 2023, RentPrice = 550 },
+            new() { Id = 7, Type = BikeType.Mountain, WheelSize = 29, MaxPassengerWeight = 120, Weight = 13, BrakeType = "Дисковые гидравлические", Year = 2024, RentPrice = 800 },
+            new() { Id = 8, Type = BikeType.Sport, WheelSize = 27, MaxPassengerWeight = 110, Weight = 10, BrakeType = "Ободные v-brake", Year = 2023, RentPrice = 950 },
+            new() { Id = 9, Type = BikeType.City, WheelSize = 26, MaxPassengerWeight = 140, Weight = 18, BrakeType = "Дисковые механические", Year = 2022, RentPrice = 600 },
+            new() { Id = 10, Type = BikeType.Mountain, WheelSize = 26, MaxPassengerWeight = 130, Weight = 14, BrakeType = "Дисковые гидравлические", Year = 2024, RentPrice = 650 }
         ];
     }
 

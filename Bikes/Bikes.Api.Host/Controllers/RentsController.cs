@@ -80,10 +80,10 @@ public class RentsController(IRentService service, ILogger<RentsController> logg
     /// </summary>
     /// <param name="rentDto"></param>
     [HttpPost]
-    [ProducesResponseType(typeof(CreatedAtActionResult), StatusCodes.Status201Created)]
+    [ProducesResponseType(typeof(RentGetDto), StatusCodes.Status201Created)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status500InternalServerError)]
-    public ActionResult<CreatedAtActionResult> CreateRent([FromBody] RentCreateUpdateDto rentDto)
+    public ActionResult<RentGetDto> CreateRent([FromBody] RentCreateUpdateDto rentDto)
     {
         try
         {
@@ -104,10 +104,21 @@ public class RentsController(IRentService service, ILogger<RentsController> logg
             var id = service.CreateRent(rentDto);
             logger.LogInformation("Created rent with ID {RentId}", id);
 
+            var createdRent = service.GetRentById(id);
+
+            if (createdRent == null)
+            {
+                logger.LogError("Failed to retrieve created rent with ID {RentId}", id);
+                return Problem(
+                    title: "Internal Server Error",
+                    detail: "Rent was created but cannot be retrieved.",
+                    statusCode: StatusCodes.Status500InternalServerError);
+            }
+
             return CreatedAtAction(
                 nameof(GetRent),
                 new { id },
-                new { id, message = "Rent created successfully." });
+                createdRent);
         }
         catch (ArgumentException ex)
         {

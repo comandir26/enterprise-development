@@ -81,10 +81,10 @@ public class BikesController(IBikeService service, ILogger<BikesController> logg
     /// </summary>
     /// <param name="bikeDto"></param>
     [HttpPost]
-    [ProducesResponseType(typeof(CreatedAtActionResult), StatusCodes.Status201Created)]
+    [ProducesResponseType(typeof(BikeGetDto), StatusCodes.Status201Created)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status500InternalServerError)]
-    public ActionResult<CreatedAtActionResult> CreateBike([FromBody] BikeCreateUpdateDto bikeDto)
+    public ActionResult<BikeGetDto> CreateBike([FromBody] BikeCreateUpdateDto bikeDto)
     {
         try
         {
@@ -104,10 +104,21 @@ public class BikesController(IBikeService service, ILogger<BikesController> logg
             var id = service.CreateBike(bikeDto);
             logger.LogInformation("Created bike with ID {BikeId}", id);
 
+            var createdBike = service.GetBikeById(id);
+
+            if (createdBike == null)
+            {
+                logger.LogError("Failed to retrieve created bike with ID {BikeId}", id);
+                return Problem(
+                    title: "Internal Server Error",
+                    detail: "Bike was created but cannot be retrieved.",
+                    statusCode: StatusCodes.Status500InternalServerError);
+            }
+
             return CreatedAtAction(
                 nameof(GetBike),
                 new { id },
-                new { id, message = "Bike created successfully." });
+                createdBike);
         }
         catch (ArgumentException ex)
         {
