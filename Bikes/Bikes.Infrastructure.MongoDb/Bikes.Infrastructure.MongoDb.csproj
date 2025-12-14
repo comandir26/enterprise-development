@@ -15,6 +15,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\Bikes.Domain\Bikes.Domain.csproj" />
+    <ProjectReference Include="..\Bikes.Infrastructure.InMemory\Bikes.Infrastructure.InMemory.csproj" />
   </ItemGroup>
 
 </Project>

@@ -1,9 +1,8 @@
 ﻿using Bikes.Application.Interfaces;
 using Bikes.Application.Services;
-using Bikes.Domain.Repositories;
-using Bikes.Infrastructure.InMemory.Repositories;
+using Microsoft.Extensions.DependencyInjection;
 
-namespace Bikes.Api.Host.Extensions;
+namespace Bikes.Application.Extensions;
 
 /// <summary>
 /// A class for hidden registration of services
@@ -18,11 +17,6 @@ public static class ServiceCollectionExtensions
     public static IServiceCollection AddBikeRentalServices(this IServiceCollection services)
     {
         services.AddAutoMapper(typeof(BikeService).Assembly);
-
-        services.AddSingleton<IRepository<Domain.Models.Bike, int>, InMemoryBikeRepository>();
-        services.AddSingleton<IRepository<Domain.Models.BikeModel, int>, InMemoryBikeModelRepository>();
-        services.AddSingleton<IRepository<Domain.Models.Renter, int>, InMemoryRenterRepository>();
-        services.AddSingleton<IRepository<Domain.Models.Rent, int>, InMemoryRentRepository>();
 
         services.AddScoped<IBikeService, BikeService>();
         services.AddScoped<IBikeModelService, BikeModelService>();

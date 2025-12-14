@@ -15,14 +15,8 @@ public class MongoBikeRepository : IRepository<Bike, int>
     {
         _collection = context.Bikes;
 
- 
         var indexKeysDefinition = Builders<Bike>.IndexKeys.Ascending(b => b.Id);
         _collection.Indexes.CreateOne(new CreateIndexModel<Bike>(indexKeysDefinition));
-
-        var serialNumberIndexKeys = Builders<Bike>.IndexKeys.Ascending(b => b.SerialNumber);
-        var serialNumberIndexOptions = new CreateIndexOptions { Unique = true };
-        _collection.Indexes.CreateOne(
-            new CreateIndexModel<Bike>(serialNumberIndexKeys, serialNumberIndexOptions));
     }
 
     public int Create(Bike entity)
