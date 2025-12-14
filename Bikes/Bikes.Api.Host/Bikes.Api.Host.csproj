@@ -13,7 +13,8 @@
   <ItemGroup>
     <ProjectReference Include="..\Bikes.Application\Bikes.Application.csproj" />
     <ProjectReference Include="..\Bikes.Contracts\Bikes.Contracts.csproj" />
-    <ProjectReference Include="..\Bikes.Infrastructure.InMemory\Bikes.Infrastructure.InMemory.csproj" />
+    <ProjectReference Include="..\Bikes.Infrastructure.MongoDb\Bikes.Infrastructure.MongoDb.csproj" />
+    <ProjectReference Include="..\Bikes.ServiceDefaults\Bikes.ServiceDefaults.csproj" />
   </ItemGroup>
 
 </Project>
