@@ -21,6 +21,11 @@ public class MongoRentRepository : IRepository<Rent, int>
         _collection.Indexes.CreateOne(new CreateIndexModel<Rent>(indexKeysDefinition));
     }
 
+    /// <summary>
+    /// Creates a new object
+    /// </summary>
+    /// <param name="entity">Object</param>
+    /// <returns>ID of the created object</returns>
     public int Create(Rent entity)
     {
         if (entity.Bike != null && entity.Bike.Id > 0)
@@ -43,6 +48,10 @@ public class MongoRentRepository : IRepository<Rent, int>
         return entity.Id;
     }
 
+    /// <summary>
+    /// Returns all existing objects
+    /// </summary>
+    /// <returns>List of existing objects</returns>
     public List<Rent> ReadAll()
     {
 
@@ -56,6 +65,11 @@ public class MongoRentRepository : IRepository<Rent, int>
         return rents;
     }
 
+    /// <summary>
+    /// Returns object by id
+    /// </summary>
+    /// <param name="id">Id</param>
+    /// <returns>Object if exist</returns>
     public Rent? Read(int id)
     {
         var rent = _collection.Find(r => r.Id == id).FirstOrDefault();
@@ -66,6 +80,12 @@ public class MongoRentRepository : IRepository<Rent, int>
         return rent;
     }
 
+    /// <summary>
+    /// Updates an existing object
+    /// </summary>
+    /// <param name="id">Id</param>
+    /// <param name="entity">Object</param>
+    /// <returns>Object if exist</returns>
     public Rent? Update(int id, Rent entity)
     {
         entity.Id = id;
@@ -76,12 +96,21 @@ public class MongoRentRepository : IRepository<Rent, int>
         return result.ModifiedCount > 0 ? entity : null;
     }
 
+    /// <summary>
+    /// Deletes an existing object by id
+    /// </summary>
+    /// <param name="id"></param>
+    /// <returns>True or false? result of deleting</returns>
     public bool Delete(int id)
     {
         var result = _collection.DeleteOne(r => r.Id == id);
         return result.DeletedCount > 0;
     }
 
+    /// <summary>
+    /// Load related data
+    /// </summary>
+    /// <param name="rent"></param>
     private void LoadRelatedData(Rent rent)
     {
         if (rent.Bike != null && rent.Bike.Id > 0)

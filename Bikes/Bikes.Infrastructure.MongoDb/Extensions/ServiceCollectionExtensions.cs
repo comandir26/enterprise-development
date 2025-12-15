@@ -6,21 +6,32 @@ using Bikes.Infrastructure.MongoDb.Repositories;
 
 namespace Bikes.Infrastructure.MongoDb.Extensions;
 
+/// <summary>
+/// A class for hidden registration of services
+/// </summary>
 public static class ServiceCollectionExtensions
 {
+    /// <summary>
+    /// The method that registers services
+    /// </summary>
+    /// <param name="services"></param>
+    /// <param name="configuration"></param>
+    /// <returns></returns>
     public static IServiceCollection AddMongoDbInfrastructure(
         this IServiceCollection services,
         IConfiguration configuration)
     {
-        var mongoDbSection = configuration.GetSection(MongoDbSettings.SectionName);
-        var mongoDbSettings = new MongoDbSettings
-        {
-            ConnectionString = mongoDbSection["ConnectionString"]!,
-            DatabaseName = mongoDbSection["DatabaseName"]!
-        };
+        var connectionString = configuration.GetConnectionString("MongoDB");
+        var databaseName = configuration["MongoDb:DatabaseName"] ?? "BikesDB";
 
-        services.AddSingleton(mongoDbSettings);
-        services.AddSingleton<MongoDbContext>();
+        services.Configure<MongoDbSettings>(options =>
+        {
+            options.ConnectionString = connectionString
+                ?? "mongodb://localhost:27017";
+            options.DatabaseName = databaseName;
+        });
+
+        services.AddSingleton<MongoDbContext>(); 
         services.AddSingleton<MongoDbSeeder>();
 
         services.AddSingleton<IRepository<Domain.Models.Bike, int>, MongoBikeRepository>();

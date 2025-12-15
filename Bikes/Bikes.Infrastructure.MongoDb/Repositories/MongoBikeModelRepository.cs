@@ -19,6 +19,11 @@ public class MongoBikeModelRepository : IRepository<BikeModel, int>
         _collection.Indexes.CreateOne(new CreateIndexModel<BikeModel>(indexKeysDefinition));
     }
 
+    /// <summary>
+    /// Creates a new object
+    /// </summary>
+    /// <param name="entity">Object</param>
+    /// <returns>ID of the created object</returns>
     public int Create(BikeModel entity)
     {
         var maxId = _collection.Find(_ => true)
@@ -31,16 +36,31 @@ public class MongoBikeModelRepository : IRepository<BikeModel, int>
         return entity.Id;
     }
 
+    /// <summary>
+    /// Returns all existing objects
+    /// </summary>
+    /// <returns>List of existing objects</returns>
     public List<BikeModel> ReadAll()
     {
         return _collection.Find(_ => true).ToList();
     }
 
+    /// <summary>
+    /// Returns object by id
+    /// </summary>
+    /// <param name="id">Id</param>
+    /// <returns>Object if exist</returns>
     public BikeModel? Read(int id)
     {
         return _collection.Find(m => m.Id == id).FirstOrDefault();
     }
 
+    /// <summary>
+    /// Updates an existing object
+    /// </summary>
+    /// <param name="id">Id</param>
+    /// <param name="entity">Object</param>
+    /// <returns>Object if exist</returns>
     public BikeModel? Update(int id, BikeModel entity)
     {
         entity.Id = id;
@@ -48,6 +68,11 @@ public class MongoBikeModelRepository : IRepository<BikeModel, int>
         return result.ModifiedCount > 0 ? entity : null;
     }
 
+    /// <summary>
+    /// Deletes an existing object by id
+    /// </summary>
+    /// <param name="id"></param>
+    /// <returns>True or false? result of deleting</returns>
     public bool Delete(int id)
     {
         var result = _collection.DeleteOne(m => m.Id == id);

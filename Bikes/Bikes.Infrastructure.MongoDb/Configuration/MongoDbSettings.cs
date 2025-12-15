@@ -10,10 +10,10 @@ public class MongoDbSettings
     /// <summary>
     /// Connection string
     /// </summary>
-    public required string ConnectionString { get; set; }
+    public string ConnectionString { get; set; } = string.Empty;
 
     /// <summary>
     /// Database Name
     /// </summary>
-    public required string DatabaseName { get; set; }
+    public string DatabaseName { get; set; } = string.Empty;
 }

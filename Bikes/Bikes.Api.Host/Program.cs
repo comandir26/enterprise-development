@@ -1,18 +1,22 @@
 using Bikes.Application.Extensions;
 using Bikes.Infrastructure.MongoDb;
 using Bikes.Infrastructure.MongoDb.Extensions;
+using Bikes.ServiceDefaults;
 
 var builder = WebApplication.CreateBuilder(args);
+
+builder.AddServiceDefaults();
 
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
 builder.Services.AddMongoDbInfrastructure(builder.Configuration);
-
 builder.Services.AddBikeRentalServices();
 
 var app = builder.Build();
+
+app.MapDefaultEndpoints();
 
 using (var scope = app.Services.CreateScope())
 {
