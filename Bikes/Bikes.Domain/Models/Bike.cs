@@ -19,6 +19,11 @@ public class Bike
     /// Bike's color
     /// </summary>
     public required string Color { get; set; }
+    
+    /// <summary>
+    /// Bike's model id for database
+    /// </summary>
+    public required int ModelId { get; set; }
 
     /// <summary>
     /// Bike's model

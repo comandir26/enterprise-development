@@ -1,22 +1,18 @@
-﻿using MongoDB.Driver;
-using Bikes.Domain.Models;
+﻿using Bikes.Domain.Models;
 using Bikes.Domain.Repositories;
 
 namespace Bikes.Infrastructure.MongoDb.Repositories;
 
 /// <summary>
-/// Repository for working with bike models in MongoDB
+/// A repository for working with bike models in MongoDB
 /// </summary>
 public class MongoBikeModelRepository : IRepository<BikeModel, int>
 {
-    private readonly IMongoCollection<BikeModel> _collection;
+    private readonly BikesDbContext _context;
 
-    public MongoBikeModelRepository(MongoDbContext context)
+    public MongoBikeModelRepository(BikesDbContext context)
     {
-        _collection = context.BikeModels;
-
-        var indexKeysDefinition = Builders<BikeModel>.IndexKeys.Ascending(m => m.Id);
-        _collection.Indexes.CreateOne(new CreateIndexModel<BikeModel>(indexKeysDefinition));
+        _context = context;
     }
 
     /// <summary>
@@ -26,13 +22,18 @@ public class MongoBikeModelRepository : IRepository<BikeModel, int>
     /// <returns>ID of the created object</returns>
     public int Create(BikeModel entity)
     {
-        var maxId = _collection.Find(_ => true)
-            .SortByDescending(m => m.Id)
-            .Limit(1)
-            .FirstOrDefault()?.Id ?? 0;
+        if (entity.Id == 0)
+        {
+            var lastId = _context.BikeModels
+                .OrderByDescending(b => b.Id)
+                .Select(b => b.Id)
+                .FirstOrDefault();
 
-        entity.Id = maxId + 1;
-        _collection.InsertOne(entity);
+            entity.Id = lastId + 1;
+        }
+
+        _context.BikeModels.Add(entity);
+        _context.SaveChanges();
         return entity.Id;
     }
 
@@ -42,7 +43,7 @@ public class MongoBikeModelRepository : IRepository<BikeModel, int>
     /// <returns>List of existing objects</returns>
     public List<BikeModel> ReadAll()
     {
-        return _collection.Find(_ => true).ToList();
+        return _context.BikeModels.ToList();
     }
 
     /// <summary>
@@ -52,7 +53,7 @@ public class MongoBikeModelRepository : IRepository<BikeModel, int>
     /// <returns>Object if exist</returns>
     public BikeModel? Read(int id)
     {
-        return _collection.Find(m => m.Id == id).FirstOrDefault();
+        return _context.BikeModels.Find(id);
     }
 
     /// <summary>
@@ -63,9 +64,15 @@ public class MongoBikeModelRepository : IRepository<BikeModel, int>
     /// <returns>Object if exist</returns>
     public BikeModel? Update(int id, BikeModel entity)
     {
-        entity.Id = id;
-        var result = _collection.ReplaceOne(m => m.Id == id, entity);
-        return result.ModifiedCount > 0 ? entity : null;
+        var existingModel = _context.BikeModels.Find(id);
+        if (existingModel == null) return null;
+
+        _context.Entry(existingModel).CurrentValues.SetValues(entity);
+
+        existingModel.Id = id;
+
+        _context.SaveChanges();
+        return existingModel;
     }
 
     /// <summary>
@@ -75,7 +82,11 @@ public class MongoBikeModelRepository : IRepository<BikeModel, int>
     /// <returns>True or false? result of deleting</returns>
     public bool Delete(int id)
     {
-        var result = _collection.DeleteOne(m => m.Id == id);
-        return result.DeletedCount > 0;
+        var model = _context.BikeModels.Find(id);
+        if (model == null) return false;
+
+        _context.BikeModels.Remove(model);
+        _context.SaveChanges();
+        return true;
     }
 }

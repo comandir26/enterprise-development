@@ -32,6 +32,8 @@ public class RentService(
         var rent = mapper.Map<Rent>(rentDto);
         rent.Bike = bike;
         rent.Renter = renter;
+        rent.BikeId = rentDto.BikeId;    
+        rent.RenterId = rentDto.RenterId; 
 
         var id = rentRepository.Create(rent);
         var createdRent = rentRepository.Read(id);

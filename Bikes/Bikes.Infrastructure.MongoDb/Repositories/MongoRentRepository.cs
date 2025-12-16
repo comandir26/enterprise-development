@@ -1,24 +1,18 @@
-﻿using MongoDB.Driver;
-using Bikes.Domain.Models;
+﻿using Bikes.Domain.Models;
 using Bikes.Domain.Repositories;
 
 namespace Bikes.Infrastructure.MongoDb.Repositories;
 
 /// <summary>
-/// Repository for working with rents in MongoDB
+/// A repository for working with rents in MongoDB
 /// </summary>
 public class MongoRentRepository : IRepository<Rent, int>
 {
-    private readonly IMongoCollection<Rent> _collection;
-    private readonly MongoDbContext _context;
+    private readonly BikesDbContext _context;
 
-    public MongoRentRepository(MongoDbContext context)
+    public MongoRentRepository(BikesDbContext context) 
     {
         _context = context;
-        _collection = context.Rents;
-
-        var indexKeysDefinition = Builders<Rent>.IndexKeys.Ascending(r => r.Id);
-        _collection.Indexes.CreateOne(new CreateIndexModel<Rent>(indexKeysDefinition));
     }
 
     /// <summary>
@@ -28,23 +22,18 @@ public class MongoRentRepository : IRepository<Rent, int>
     /// <returns>ID of the created object</returns>
     public int Create(Rent entity)
     {
-        if (entity.Bike != null && entity.Bike.Id > 0)
+        if (entity.Id == 0)
         {
-            entity.Bike = _context.Bikes.Find(b => b.Id == entity.Bike.Id).FirstOrDefault();
+            var lastId = _context.Rents
+                .OrderByDescending(b => b.Id)
+                .Select(b => b.Id)
+                .FirstOrDefault();
+
+            entity.Id = lastId + 1;
         }
 
-        if (entity.Renter != null && entity.Renter.Id > 0)
-        {
-            entity.Renter = _context.Renters.Find(r => r.Id == entity.Renter.Id).FirstOrDefault();
-        }
-
-        var maxId = _collection.Find(_ => true)
-            .SortByDescending(r => r.Id)
-            .Limit(1)
-            .FirstOrDefault()?.Id ?? 0;
-
-        entity.Id = maxId + 1;
-        _collection.InsertOne(entity);
+        _context.Rents.Add(entity);
+        _context.SaveChanges();
         return entity.Id;
     }
 
@@ -54,15 +43,7 @@ public class MongoRentRepository : IRepository<Rent, int>
     /// <returns>List of existing objects</returns>
     public List<Rent> ReadAll()
     {
-
-        var rents = _collection.Find(_ => true).ToList();
-
-        foreach (var rent in rents)
-        {
-            LoadRelatedData(rent);
-        }
-
-        return rents;
+        return _context.Rents.ToList();
     }
 
     /// <summary>
@@ -72,12 +53,7 @@ public class MongoRentRepository : IRepository<Rent, int>
     /// <returns>Object if exist</returns>
     public Rent? Read(int id)
     {
-        var rent = _collection.Find(r => r.Id == id).FirstOrDefault();
-        if (rent != null)
-        {
-            LoadRelatedData(rent);
-        }
-        return rent;
+        return _context.Rents.FirstOrDefault(r => r.Id == id);
     }
 
     /// <summary>
@@ -88,12 +64,16 @@ public class MongoRentRepository : IRepository<Rent, int>
     /// <returns>Object if exist</returns>
     public Rent? Update(int id, Rent entity)
     {
-        entity.Id = id;
+        var existingRent = _context.Rents.FirstOrDefault(r => r.Id == id);
+        if (existingRent == null) return null;
 
-        LoadRelatedData(entity);
+        existingRent.RentalStartTime = entity.RentalStartTime;
+        existingRent.RentalDuration = entity.RentalDuration;
+        existingRent.BikeId = entity.BikeId;
+        existingRent.RenterId = entity.RenterId;
 
-        var result = _collection.ReplaceOne(r => r.Id == id, entity);
-        return result.ModifiedCount > 0 ? entity : null;
+        _context.SaveChanges();
+        return existingRent;
     }
 
     /// <summary>
@@ -103,24 +83,11 @@ public class MongoRentRepository : IRepository<Rent, int>
     /// <returns>True or false? result of deleting</returns>
     public bool Delete(int id)
     {
-        var result = _collection.DeleteOne(r => r.Id == id);
-        return result.DeletedCount > 0;
-    }
+        var rent = _context.Rents.Find(id);
+        if (rent == null) return false;
 
-    /// <summary>
-    /// Load related data
-    /// </summary>
-    /// <param name="rent"></param>
-    private void LoadRelatedData(Rent rent)
-    {
-        if (rent.Bike != null && rent.Bike.Id > 0)
-        {
-            rent.Bike = _context.Bikes.Find(b => b.Id == rent.Bike.Id).FirstOrDefault();
-        }
-
-        if (rent.Renter != null && rent.Renter.Id > 0)
-        {
-            rent.Renter = _context.Renters.Find(r => r.Id == rent.Renter.Id).FirstOrDefault();
-        }
+        _context.Rents.Remove(rent);
+        _context.SaveChanges();
+        return true;
     }
 }

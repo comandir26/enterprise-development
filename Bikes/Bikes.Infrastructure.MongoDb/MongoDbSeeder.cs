@@ -1,4 +1,4 @@
-﻿using MongoDB.Driver;
+﻿using Microsoft.EntityFrameworkCore;
 using Bikes.Infrastructure.InMemory.Seeders;
 using Microsoft.Extensions.Logging;
 
@@ -9,31 +9,18 @@ namespace Bikes.Infrastructure.MongoDb;
 /// </summary>
 public class MongoDbSeeder
 {
-
-    private readonly MongoDbContext _context;
-
+    private readonly BikesDbContext _context;
     private readonly ILogger<MongoDbSeeder> _logger;
 
-    /// <summary>
-    /// Constructor of the MongoDbSeeder class
-    /// </summary>
-    /// <param name="context">MongoDB context for working with the database</param>
-    /// <param name="logger">Logger for recording diagnostic information</param>
-    public MongoDbSeeder(MongoDbContext context, ILogger<MongoDbSeeder> logger)
+    public MongoDbSeeder(BikesDbContext context, ILogger<MongoDbSeeder> logger)
     {
         _context = context;
         _logger = logger;
     }
 
-    /// <summary>
-    /// The main method for filling the database with initial data
-    /// </summary>
-    /// <returns>Asynchronous task</returns>
     public async Task SeedAsync()
     {
-        var hasModels = await _context.BikeModels.Find(_ => true).AnyAsync();
-
-        if (hasModels)
+        if (await _context.Bikes.AnyAsync())
         {
             _logger.LogInformation("Database already contains data. Skipping seeding.");
             return;
@@ -46,30 +33,13 @@ public class MongoDbSeeder
         var renters = InMemorySeeder.GetRenters();
         var rents = InMemorySeeder.GetRents();
 
-        if (models.Any())
-        {
-            await _context.BikeModels.InsertManyAsync(models);
-            _logger.LogInformation("Inserted {Count} bike models into database", models.Count);
-        }
+        await _context.BikeModels.AddRangeAsync(models);
+        await _context.Bikes.AddRangeAsync(bikes);
+        await _context.Renters.AddRangeAsync(renters);
+        await _context.Rents.AddRangeAsync(rents);
 
-        if (bikes.Any())
-        {
-            await _context.Bikes.InsertManyAsync(bikes);
-            _logger.LogInformation("Inserted {Count} bikes into database", bikes.Count);
-        }
+        await _context.SaveChangesAsync();
 
-        if (renters.Any())
-        {
-            await _context.Renters.InsertManyAsync(renters);
-            _logger.LogInformation("Inserted {Count} renters into database", renters.Count);
-        }
-
-        if (rents.Any())
-        {
-            await _context.Rents.InsertManyAsync(rents);
-            _logger.LogInformation("Inserted {Count} rents into database", rents.Count);
-        }
-
-        _logger.LogInformation("MongoDB database seeding completed successfully");
+        _logger.LogInformation("Seeding completed.");
     }
 }

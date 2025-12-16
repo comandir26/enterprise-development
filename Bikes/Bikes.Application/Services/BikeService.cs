@@ -26,6 +26,7 @@ public class BikeService(
 
         var bike = mapper.Map<Bike>(bikeDto);
         bike.Model = model;
+        bike.ModelId = bikeDto.ModelId;
 
         var id = bikeRepository.Create(bike);
 

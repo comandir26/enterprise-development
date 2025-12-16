@@ -21,6 +21,16 @@ public class Rent
     public required int RentalDuration { get; set; }
 
     /// <summary>
+    /// Renter's id for database
+    /// </summary>
+    public required int RenterId { get; set; }
+
+    /// <summary>
+    /// Bike's id for database
+    /// </summary>
+    public required int BikeId { get; set; }
+
+    /// <summary>
     /// Renter
     /// </summary>
     public required Renter Renter { get; set; }

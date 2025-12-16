@@ -1,5 +1,6 @@
 ﻿using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.EntityFrameworkCore;
 using Bikes.Domain.Repositories;
 using Bikes.Infrastructure.MongoDb.Configuration;
 using Bikes.Infrastructure.MongoDb.Repositories;
@@ -12,17 +13,17 @@ namespace Bikes.Infrastructure.MongoDb.Extensions;
 public static class ServiceCollectionExtensions
 {
     /// <summary>
-    /// The method that registers services
+    /// A method for registering MongoDB services through the Entity Framework Core
     /// </summary>
-    /// <param name="services"></param>
-    /// <param name="configuration"></param>
-    /// <returns></returns>
+    /// <param name="services">Collection of services</param>
+    /// <param name="configuration">Application Configuration</param>
+    /// <returns>Collection of services</returns>
     public static IServiceCollection AddMongoDbInfrastructure(
         this IServiceCollection services,
         IConfiguration configuration)
     {
         var connectionString = configuration.GetConnectionString("MongoDB");
-        var databaseName = configuration["MongoDb:DatabaseName"] ?? "BikesDB";
+        var databaseName = configuration["MongoDb:DatabaseName"]!;
 
         services.Configure<MongoDbSettings>(options =>
         {
@@ -31,13 +32,17 @@ public static class ServiceCollectionExtensions
             options.DatabaseName = databaseName;
         });
 
-        services.AddSingleton<MongoDbContext>(); 
-        services.AddSingleton<MongoDbSeeder>();
+        services.AddDbContext<BikesDbContext>(options =>
+        {
+            options.UseMongoDB(connectionString ?? "mongodb://localhost:27017", databaseName);
+        });
 
-        services.AddSingleton<IRepository<Domain.Models.Bike, int>, MongoBikeRepository>();
-        services.AddSingleton<IRepository<Domain.Models.BikeModel, int>, MongoBikeModelRepository>();
-        services.AddSingleton<IRepository<Domain.Models.Renter, int>, MongoRenterRepository>();
-        services.AddSingleton<IRepository<Domain.Models.Rent, int>, MongoRentRepository>();
+        services.AddScoped<MongoDbSeeder>();
+
+        services.AddScoped<IRepository<Domain.Models.Bike, int>, MongoBikeRepository>();
+        services.AddScoped<IRepository<Domain.Models.BikeModel, int>, MongoBikeModelRepository>();
+        services.AddScoped<IRepository<Domain.Models.Renter, int>, MongoRenterRepository>();
+        services.AddScoped<IRepository<Domain.Models.Rent, int>, MongoRentRepository>();
 
         return services;
     }

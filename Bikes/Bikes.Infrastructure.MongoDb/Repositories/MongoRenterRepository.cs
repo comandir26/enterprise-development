@@ -1,22 +1,18 @@
-﻿using MongoDB.Driver;
-using Bikes.Domain.Models;
+﻿using Bikes.Domain.Models;
 using Bikes.Domain.Repositories;
 
 namespace Bikes.Infrastructure.MongoDb.Repositories;
 
 /// <summary>
-/// Repository for working with renters in MongoDB
+/// A repository for working with renters in MongoDB
 /// </summary>
 public class MongoRenterRepository : IRepository<Renter, int>
 {
-    private readonly IMongoCollection<Renter> _collection;
+    private readonly BikesDbContext _context;
 
-    public MongoRenterRepository(MongoDbContext context)
+    public MongoRenterRepository(BikesDbContext context)
     {
-        _collection = context.Renters;
-
-        var indexKeysDefinition = Builders<Renter>.IndexKeys.Ascending(r => r.Id);
-        _collection.Indexes.CreateOne(new CreateIndexModel<Renter>(indexKeysDefinition));
+        _context = context;
     }
 
     /// <summary>
@@ -26,13 +22,18 @@ public class MongoRenterRepository : IRepository<Renter, int>
     /// <returns>ID of the created object</returns>
     public int Create(Renter entity)
     {
-        var maxId = _collection.Find(_ => true)
-            .SortByDescending(r => r.Id)
-            .Limit(1)
-            .FirstOrDefault()?.Id ?? 0;
+        if (entity.Id == 0)
+        {
+            var lastId = _context.Renters
+                .OrderByDescending(b => b.Id)
+                .Select(b => b.Id)
+                .FirstOrDefault();
 
-        entity.Id = maxId + 1;
-        _collection.InsertOne(entity);
+            entity.Id = lastId + 1;
+        }
+
+        _context.Renters.Add(entity);
+        _context.SaveChanges();
         return entity.Id;
     }
 
@@ -42,7 +43,7 @@ public class MongoRenterRepository : IRepository<Renter, int>
     /// <returns>List of existing objects</returns>
     public List<Renter> ReadAll()
     {
-        return _collection.Find(_ => true).ToList();
+        return _context.Renters.ToList();
     }
 
     /// <summary>
@@ -52,7 +53,7 @@ public class MongoRenterRepository : IRepository<Renter, int>
     /// <returns>Object if exist</returns>
     public Renter? Read(int id)
     {
-        return _collection.Find(r => r.Id == id).FirstOrDefault();
+        return _context.Renters.Find(id);
     }
 
     /// <summary>
@@ -63,9 +64,14 @@ public class MongoRenterRepository : IRepository<Renter, int>
     /// <returns>Object if exist</returns>
     public Renter? Update(int id, Renter entity)
     {
-        entity.Id = id;
-        var result = _collection.ReplaceOne(r => r.Id == id, entity);
-        return result.ModifiedCount > 0 ? entity : null;
+        var existingRenter = _context.Renters.Find(id);
+        if (existingRenter == null) return null;
+
+        _context.Entry(existingRenter).CurrentValues.SetValues(entity);
+        existingRenter.Id = id;
+
+        _context.SaveChanges();
+        return existingRenter;
     }
 
     /// <summary>
@@ -75,7 +81,11 @@ public class MongoRenterRepository : IRepository<Renter, int>
     /// <returns>True or false? result of deleting</returns>
     public bool Delete(int id)
     {
-        var result = _collection.DeleteOne(r => r.Id == id);
-        return result.DeletedCount > 0;
+        var renter = _context.Renters.Find(id);
+        if (renter == null) return false;
+
+        _context.Renters.Remove(renter);
+        _context.SaveChanges();
+        return true;
     }
 }

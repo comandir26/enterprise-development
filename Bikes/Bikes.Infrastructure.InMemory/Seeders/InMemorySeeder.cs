@@ -36,16 +36,16 @@ public static class InMemorySeeder
 
         return
         [
-            new() { Id = 1, SerialNumber = "MTB202301001", Color = "Черный", Model = models[0] },
-            new() { Id = 2, SerialNumber = "SPT202402001", Color = "Красный", Model = models[1] },
-            new() { Id = 3, SerialNumber = "CTY202203001", Color = "Синий", Model = models[2] },
-            new() { Id = 4, SerialNumber = "MTB202302001", Color = "Зеленый", Model = models[3] },
-            new() { Id = 5, SerialNumber = "SPT202403001", Color = "Желтый", Model = models[4] },
-            new() { Id = 6, SerialNumber = "CTY202304001", Color = "Белый", Model = models[5] },
-            new() { Id = 7, SerialNumber = "MTB202404001", Color = "Оранжевый", Model = models[6] },
-            new() { Id = 8, SerialNumber = "SPT202305001", Color = "Фиолетовый", Model = models[7] },
-            new() { Id = 9, SerialNumber = "CTY202205001", Color = "Серый", Model = models[8] },
-            new() { Id = 10, SerialNumber = "MTB202405001", Color = "Голубой", Model = models[9] }
+            new() { Id = 1, SerialNumber = "MTB202301001", Color = "Черный", ModelId = models[0].Id, Model = models[0] },
+            new() { Id = 2, SerialNumber = "SPT202402001", Color = "Красный", ModelId = models[1].Id, Model = models[1] },
+            new() { Id = 3, SerialNumber = "CTY202203001", Color = "Синий", ModelId = models[2].Id, Model = models[2] },
+            new() { Id = 4, SerialNumber = "MTB202302001", Color = "Зеленый", ModelId = models[3].Id, Model = models[3] },
+            new() { Id = 5, SerialNumber = "SPT202403001", Color = "Желтый", ModelId = models[4].Id, Model = models[4] },
+            new() { Id = 6, SerialNumber = "CTY202304001", Color = "Белый", ModelId = models[5].Id, Model = models[5] },
+            new() { Id = 7, SerialNumber = "MTB202404001", Color = "Оранжевый", ModelId = models[6].Id, Model = models[6] },
+            new() { Id = 8, SerialNumber = "SPT202305001", Color = "Фиолетовый", ModelId = models[7].Id, Model = models[7] },
+            new() { Id = 9, SerialNumber = "CTY202205001", Color = "Серый", ModelId = models[8].Id, Model = models[8] },
+            new() { Id = 10, SerialNumber = "MTB202405001", Color = "Голубой", ModelId = models[9].Id, Model = models[9] }
         ];
     }
 
@@ -79,26 +79,26 @@ public static class InMemorySeeder
 
         return
         [
-            new() { Id = 1, RentalStartTime = new DateTime(2025, 6, 10, 9, 0, 0), RentalDuration = 3, Renter = renters[0], Bike = bikes[0] },
-            new() { Id = 2, RentalStartTime = new DateTime(2025, 6, 12, 14, 30, 0), RentalDuration = 2, Renter = renters[1], Bike = bikes[0] },
-            new() { Id = 3, RentalStartTime = new DateTime(2025, 6, 15, 10, 0, 0), RentalDuration = 4, Renter = renters[2], Bike = bikes[0] },
-            new() { Id = 4, RentalStartTime = new DateTime(2025, 6, 18, 16, 0, 0), RentalDuration = 1, Renter = renters[3], Bike = bikes[1] },
-            new() { Id = 5, RentalStartTime = new DateTime(2025, 6, 20, 11, 0, 0), RentalDuration = 5, Renter = renters[4], Bike = bikes[1] },
-            new() { Id = 6, RentalStartTime = new DateTime(2025, 6, 22, 13, 0, 0), RentalDuration = 2, Renter = renters[5], Bike = bikes[1] },
-            new() { Id = 7, RentalStartTime = new DateTime(2025, 6, 25, 15, 30, 0), RentalDuration = 3, Renter = renters[6], Bike = bikes[2] },
-            new() { Id = 8, RentalStartTime = new DateTime(2025, 6, 28, 9, 30, 0), RentalDuration = 4, Renter = renters[7], Bike = bikes[2] },
-            new() { Id = 9, RentalStartTime = new DateTime(2025, 7, 1, 12, 0, 0), RentalDuration = 1, Renter = renters[8], Bike = bikes[3] },
-            new() { Id = 10, RentalStartTime = new DateTime(2025, 7, 3, 17, 0, 0), RentalDuration = 2, Renter = renters[9], Bike = bikes[3] },
-            new() { Id = 11, RentalStartTime = new DateTime(2025, 7, 5, 10, 0, 0), RentalDuration = 3, Renter = renters[0], Bike = bikes[4] },
-            new() { Id = 12, RentalStartTime = new DateTime(2025, 7, 8, 14, 0, 0), RentalDuration = 5, Renter = renters[0], Bike = bikes[4] },
-            new() { Id = 13, RentalStartTime = new DateTime(2025, 7, 10, 16, 30, 0), RentalDuration = 2, Renter = renters[0], Bike = bikes[5] },
-            new() { Id = 14, RentalStartTime = new DateTime(2025, 7, 12, 11, 0, 0), RentalDuration = 4, Renter = renters[0], Bike = bikes[6] },
-            new() { Id = 15, RentalStartTime = new DateTime(2025, 7, 15, 13, 0, 0), RentalDuration = 1, Renter = renters[1], Bike = bikes[7] },
-            new() { Id = 16, RentalStartTime = new DateTime(2025, 7, 18, 15, 0, 0), RentalDuration = 3, Renter = renters[1], Bike = bikes[8] },
-            new() { Id = 17, RentalStartTime = new DateTime(2025, 7, 20, 9, 0, 0), RentalDuration = 2, Renter = renters[1], Bike = bikes[9] },
-            new() { Id = 18, RentalStartTime = new DateTime(2025, 7, 22, 12, 30, 0), RentalDuration = 5, Renter = renters[5], Bike = bikes[9] },
-            new() { Id = 19, RentalStartTime = new DateTime(2025, 7, 25, 14, 0, 0), RentalDuration = 3, Renter = renters[5], Bike = bikes[9] },
-            new() { Id = 20, RentalStartTime = new DateTime(2025, 7, 28, 16, 0, 0), RentalDuration = 4, Renter = renters[2], Bike = bikes[9] }
+            new() { Id = 1, RentalStartTime = new DateTime(2025, 6, 10, 9, 0, 0), RentalDuration = 3, RenterId = renters[0].Id, BikeId = bikes[0].Id, Renter = renters[0], Bike = bikes[0] },
+            new() { Id = 2, RentalStartTime = new DateTime(2025, 6, 12, 14, 30, 0), RentalDuration = 2, RenterId = renters[1].Id, BikeId = bikes[0].Id, Renter = renters[1], Bike = bikes[0] },
+            new() { Id = 3, RentalStartTime = new DateTime(2025, 6, 15, 10, 0, 0), RentalDuration = 4, RenterId = renters[2].Id, BikeId = bikes[0].Id, Renter = renters[2], Bike = bikes[0] },
+            new() { Id = 4, RentalStartTime = new DateTime(2025, 6, 18, 16, 0, 0), RentalDuration = 1, RenterId = renters[3].Id, BikeId = bikes[1].Id, Renter = renters[3], Bike = bikes[1] },
+            new() { Id = 5, RentalStartTime = new DateTime(2025, 6, 20, 11, 0, 0), RentalDuration = 5, RenterId = renters[4].Id, BikeId = bikes[1].Id, Renter = renters[4], Bike = bikes[1] },
+            new() { Id = 6, RentalStartTime = new DateTime(2025, 6, 22, 13, 0, 0), RentalDuration = 2, RenterId = renters[5].Id, BikeId = bikes[1].Id, Renter = renters[5], Bike = bikes[1] },
+            new() { Id = 7, RentalStartTime = new DateTime(2025, 6, 25, 15, 30, 0), RentalDuration = 3, RenterId = renters[6].Id, BikeId = bikes[2].Id, Renter = renters[6], Bike = bikes[2] },
+            new() { Id = 8, RentalStartTime = new DateTime(2025, 6, 28, 9, 30, 0), RentalDuration = 4, RenterId = renters[7].Id, BikeId = bikes[2].Id, Renter = renters[7], Bike = bikes[2] },
+            new() { Id = 9, RentalStartTime = new DateTime(2025, 7, 1, 12, 0, 0), RentalDuration = 1, RenterId = renters[8].Id, BikeId = bikes[3].Id, Renter = renters[8], Bike = bikes[3] },
+            new() { Id = 10, RentalStartTime = new DateTime(2025, 7, 3, 17, 0, 0), RentalDuration = 2, RenterId = renters[9].Id, BikeId = bikes[3].Id, Renter = renters[9], Bike = bikes[3] },
+            new() { Id = 11, RentalStartTime = new DateTime(2025, 7, 5, 10, 0, 0), RentalDuration = 3, RenterId = renters[0].Id, BikeId = bikes[4].Id, Renter = renters[0], Bike = bikes[4] },
+            new() { Id = 12, RentalStartTime = new DateTime(2025, 7, 8, 14, 0, 0), RentalDuration = 5, RenterId = renters[0].Id, BikeId = bikes[4].Id, Renter = renters[0], Bike = bikes[4] },
+            new() { Id = 13, RentalStartTime = new DateTime(2025, 7, 10, 16, 30, 0), RentalDuration = 2, RenterId = renters[0].Id, BikeId = bikes[5].Id, Renter = renters[0], Bike = bikes[5] },
+            new() { Id = 14, RentalStartTime = new DateTime(2025, 7, 12, 11, 0, 0), RentalDuration = 4, RenterId = renters[0].Id, BikeId = bikes[6].Id, Renter = renters[0], Bike = bikes[6] },
+            new() { Id = 15, RentalStartTime = new DateTime(2025, 7, 15, 13, 0, 0), RentalDuration = 1, RenterId = renters[1].Id, BikeId = bikes[7].Id, Renter = renters[1], Bike = bikes[7] },
+            new() { Id = 16, RentalStartTime = new DateTime(2025, 7, 18, 15, 0, 0), RentalDuration = 3, RenterId = renters[1].Id, BikeId = bikes[8].Id, Renter = renters[1], Bike = bikes[8] },
+            new() { Id = 17, RentalStartTime = new DateTime(2025, 7, 20, 9, 0, 0), RentalDuration = 2, RenterId = renters[1].Id, BikeId = bikes[9].Id, Renter = renters[1], Bike = bikes[9] },
+            new() { Id = 18, RentalStartTime = new DateTime(2025, 7, 22, 12, 30, 0), RentalDuration = 5, RenterId = renters[5].Id, BikeId = bikes[9].Id, Renter = renters[5], Bike = bikes[9] },
+            new() { Id = 19, RentalStartTime = new DateTime(2025, 7, 25, 14, 0, 0), RentalDuration = 3, RenterId = renters[5].Id, BikeId = bikes[9].Id, Renter = renters[5], Bike = bikes[9] },
+            new() { Id = 20, RentalStartTime = new DateTime(2025, 7, 28, 16, 0, 0), RentalDuration = 4, RenterId = renters[2].Id, BikeId = bikes[9].Id, Renter = renters[2], Bike = bikes[9] }
         ];
     }
 
