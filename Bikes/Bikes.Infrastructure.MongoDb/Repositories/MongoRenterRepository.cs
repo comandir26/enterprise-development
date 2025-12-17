@@ -6,15 +6,9 @@ namespace Bikes.Infrastructure.MongoDb.Repositories;
 /// <summary>
 /// A repository for working with renters in MongoDB
 /// </summary>
-public class MongoRenterRepository : IRepository<Renter, int>
+public class MongoRenterRepository(
+    BikesDbContext context) : IRepository<Renter, int>
 {
-    private readonly BikesDbContext _context;
-
-    public MongoRenterRepository(BikesDbContext context)
-    {
-        _context = context;
-    }
-
     /// <summary>
     /// Creates a new object
     /// </summary>
@@ -24,7 +18,7 @@ public class MongoRenterRepository : IRepository<Renter, int>
     {
         if (entity.Id == 0)
         {
-            var lastId = _context.Renters
+            var lastId = context.Renters
                 .OrderByDescending(b => b.Id)
                 .Select(b => b.Id)
                 .FirstOrDefault();
@@ -32,8 +26,8 @@ public class MongoRenterRepository : IRepository<Renter, int>
             entity.Id = lastId + 1;
         }
 
-        _context.Renters.Add(entity);
-        _context.SaveChanges();
+        context.Renters.Add(entity);
+        context.SaveChanges();
         return entity.Id;
     }
 
@@ -43,7 +37,7 @@ public class MongoRenterRepository : IRepository<Renter, int>
     /// <returns>List of existing objects</returns>
     public List<Renter> ReadAll()
     {
-        return _context.Renters.ToList();
+        return [.. context.Renters];
     }
 
     /// <summary>
@@ -53,7 +47,7 @@ public class MongoRenterRepository : IRepository<Renter, int>
     /// <returns>Object if exist</returns>
     public Renter? Read(int id)
     {
-        return _context.Renters.Find(id);
+        return context.Renters.Find(id);
     }
 
     /// <summary>
@@ -64,13 +58,13 @@ public class MongoRenterRepository : IRepository<Renter, int>
     /// <returns>Object if exist</returns>
     public Renter? Update(int id, Renter entity)
     {
-        var existingRenter = _context.Renters.Find(id);
+        var existingRenter = context.Renters.Find(id);
         if (existingRenter == null) return null;
 
-        _context.Entry(existingRenter).CurrentValues.SetValues(entity);
+        context.Entry(existingRenter).CurrentValues.SetValues(entity);
         existingRenter.Id = id;
 
-        _context.SaveChanges();
+        context.SaveChanges();
         return existingRenter;
     }
 
@@ -81,11 +75,11 @@ public class MongoRenterRepository : IRepository<Renter, int>
     /// <returns>True or false? result of deleting</returns>
     public bool Delete(int id)
     {
-        var renter = _context.Renters.Find(id);
+        var renter = context.Renters.Find(id);
         if (renter == null) return false;
 
-        _context.Renters.Remove(renter);
-        _context.SaveChanges();
+        context.Renters.Remove(renter);
+        context.SaveChanges();
         return true;
     }
 }
