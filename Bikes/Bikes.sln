@@ -24,6 +24,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Bikes.ServiceDefaults", "Bi
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Bikes.AppHost", "Bikes.AppHost\Bikes.AppHost.csproj", "{C5C91635-69D6-41B4-8A1C-67D6A6AADE1D}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Bikes.Generator", "Bikes.Generator\Bikes.Generator.csproj", "{C6E99932-52ED-4DC1-B308-991E13074111}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -66,6 +68,10 @@ Global
 		{C5C91635-69D6-41B4-8A1C-67D6A6AADE1D}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{C5C91635-69D6-41B4-8A1C-67D6A6AADE1D}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{C5C91635-69D6-41B4-8A1C-67D6A6AADE1D}.Release|Any CPU.Build.0 = Release|Any CPU
+		{C6E99932-52ED-4DC1-B308-991E13074111}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{C6E99932-52ED-4DC1-B308-991E13074111}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{C6E99932-52ED-4DC1-B308-991E13074111}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{C6E99932-52ED-4DC1-B308-991E13074111}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
