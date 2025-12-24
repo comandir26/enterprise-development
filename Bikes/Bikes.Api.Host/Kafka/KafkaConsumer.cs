@@ -178,7 +178,6 @@ public class KafkaConsumer : BackgroundService
                     break;
 
                 default:
-                    // Попробуем определить тип по структуре JSON
                     await TryAutoDetectAndProcessAsync(messageJson, scope, cancellationToken);
                     break;
             }

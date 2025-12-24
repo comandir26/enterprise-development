@@ -21,25 +21,22 @@ public static class KafkaConsumerExtensions
                 configuration.GetSection("Kafka").Bind(options);
 
                 var aspireKafkaConnection = configuration.GetConnectionString("kafka");
+
                 if (!string.IsNullOrEmpty(aspireKafkaConnection))
                 {
-                    Console.WriteLine($"Using Kafka connection from Aspire: {aspireKafkaConnection}");
                     options.BootstrapServers = aspireKafkaConnection;
                 }
-                else
-                {
-                    Console.WriteLine($"Using Kafka from appsettings: {options.BootstrapServers}");
-                }
 
-                Console.WriteLine($"Final Kafka BootstrapServers: {options.BootstrapServers}");
+                else if (string.IsNullOrEmpty(options.BootstrapServers))
+                {
+                    options.BootstrapServers = "localhost:9092";
+                }
             });
 
         services.AddSingleton<IConsumer<Ignore, string>>(provider =>
         {
             var options = provider.GetRequiredService<IOptions<KafkaConsumerOptions>>().Value;
             var logger = provider.GetRequiredService<ILogger<KafkaConsumer>>();
-
-            Console.WriteLine($"Creating Kafka consumer for: {options.BootstrapServers}");
 
             var config = new ConsumerConfig
             {
@@ -50,18 +47,15 @@ public static class KafkaConsumerExtensions
 
                 ApiVersionRequest = false,
                 BrokerVersionFallback = "0.10.0.0",
-
                 ApiVersionFallbackMs = 0,
-
                 SecurityProtocol = SecurityProtocol.Plaintext,
-                SslEndpointIdentificationAlgorithm = SslEndpointIdentificationAlgorithm.None,
+
                 SocketTimeoutMs = 30000,
                 SessionTimeoutMs = 30000,
                 MetadataMaxAgeMs = 300000,
+
                 AllowAutoCreateTopics = false,
-                EnablePartitionEof = true,
-                EnableSslCertificateVerification = false,
-                Debug = "broker,protocol"
+                EnablePartitionEof = true
             };
 
             var retryCount = 0;
@@ -73,15 +67,16 @@ public static class KafkaConsumerExtensions
                         .SetErrorHandler((_, error) =>
                         {
                             if (error.IsFatal)
-                                logger.LogError("Kafka Fatal Error: {Reason} (Code: {Code})", error.Reason, error.Code);
-                            else
-                                logger.LogWarning("⚠Kafka Warning: {Reason} (Code: {Code})", error.Reason, error.Code);
+                                logger.LogError("Kafka Fatal Error: {Reason} (Code: {Code})",
+                                    error.Reason, error.Code);
+                            else if (error.Code != ErrorCode.Local_Transport) 
+                                logger.LogWarning("Kafka Warning: {Reason} (Code: {Code})",
+                                    error.Reason, error.Code);
                         })
-                        .SetLogHandler((_, logMessage) =>
-                            logger.LogDebug("Kafka log: {Facility} - {Message}", logMessage.Facility, logMessage.Message))
                         .Build();
 
-                    logger.LogInformation("Kafka consumer created successfully!");
+                    logger.LogInformation("Kafka consumer created successfully for bootstrap servers: {BootstrapServers}",
+                        options.BootstrapServers);
                     return consumer;
                 }
                 catch (Exception ex)
