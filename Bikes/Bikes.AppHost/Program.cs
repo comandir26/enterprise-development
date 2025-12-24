@@ -1,14 +1,17 @@
 ﻿var builder = DistributedApplication.CreateBuilder(args);
 
 var kafka = builder.AddKafka("kafka")
-    .WithKafkaUI() 
-    .WithDataVolume(); 
+    .WithKafkaUI()
+    .WithDataVolume();
 
 var mongodb = builder.AddMongoDB("mongodb")
     .WithDataVolume();
 
 var api = builder.AddProject<Projects.Bikes_Api_Host>("bikes-api")
     .WithReference(mongodb)
-    .WithReference(kafka); 
+    .WithReference(kafka);
+
+var generator = builder.AddProject<Projects.Bikes_Generator>("bikes-generator")
+    .WithReference(kafka);
 
 builder.Build().Run();

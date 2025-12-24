@@ -5,12 +5,18 @@ using Microsoft.Extensions.Options;
 
 namespace Bikes.Generator;
 
+/// <summary>
+/// Factory implementation for creating and managing Kafka producer instances
+/// </summary>
 public class KafkaProducerFactory : IKafkaProducerFactory, IDisposable
 {
     private readonly KafkaOptions _options;
     private readonly ILogger<KafkaProducerFactory> _logger;
     private IProducer<Null, string>? _producer;
 
+    /// <summary>
+    /// Initializes the factory with Kafka options and logger
+    /// </summary>
     public KafkaProducerFactory(
         IOptions<KafkaOptions> options,
         ILogger<KafkaProducerFactory> logger)
@@ -19,16 +25,51 @@ public class KafkaProducerFactory : IKafkaProducerFactory, IDisposable
         _logger = logger;
     }
 
+    /// <summary>
+    /// Gets the Kafka bootstrap servers from environment variable or configuration
+    /// </summary>
+    /// <returns>Bootstrap servers connection string</returns>
+    private string GetBootstrapServers()
+    {
+        var connectionString = Environment.GetEnvironmentVariable("ConnectionStrings__kafka");
+        if (!string.IsNullOrEmpty(connectionString))
+        {
+            return connectionString;
+        }
+
+        return _options.BootstrapServers;
+    }
+
+    /// <summary>
+    /// Creates a Kafka producer with retry logic and connection validation
+    /// </summary>
+    /// <returns>Configured Kafka producer instance</returns>
     public IProducer<Null, string> CreateProducer()
     {
         if (_producer != null)
             return _producer;
 
+        var bootstrapServers = GetBootstrapServers();
+
+        Console.WriteLine($"Kafka Producer connecting to: {bootstrapServers}");
+
         var config = new ProducerConfig
         {
-            BootstrapServers = _options.BootstrapServers,
-            MessageTimeoutMs = _options.MessageTimeoutMs,
-            EnableDeliveryReports = true
+            BootstrapServers = bootstrapServers,
+            EnableDeliveryReports = true,
+
+            ApiVersionRequest = false,
+            ApiVersionFallbackMs = 0,
+            BrokerVersionFallback = "0.10.0.0",
+            SecurityProtocol = SecurityProtocol.Plaintext,
+            SslEndpointIdentificationAlgorithm = SslEndpointIdentificationAlgorithm.None,
+
+            SocketTimeoutMs = 30000,
+            MessageTimeoutMs = 30000,
+            RequestTimeoutMs = 30000,
+
+            EnableIdempotence = false,
+            Acks = Acks.Leader
         };
 
         var retryCount = 0;
@@ -44,7 +85,7 @@ public class KafkaProducerFactory : IKafkaProducerFactory, IDisposable
                     .Build();
 
                 _logger.LogInformation("Kafka producer connected successfully to {BootstrapServers}",
-                    _options.BootstrapServers);
+                    bootstrapServers);
 
                 return _producer;
             }
@@ -68,6 +109,9 @@ public class KafkaProducerFactory : IKafkaProducerFactory, IDisposable
         throw new InvalidOperationException("Failed to create Kafka producer");
     }
 
+    /// <summary>
+    /// Disposes the Kafka producer instance
+    /// </summary>
     public void Dispose()
     {
         _producer?.Dispose();

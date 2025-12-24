@@ -1,5 +1,6 @@
 ﻿using Bikes.Generator.Options;
 using Confluent.Kafka;
+using Confluent.Kafka.Admin;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
@@ -7,6 +8,9 @@ using System.Text.Json;
 
 namespace Bikes.Generator;
 
+/// <summary>
+/// Background service for generating and publishing fake data to Kafka
+/// </summary>
 public class KafkaProducerService : BackgroundService
 {
     private readonly GeneratorOptions _generatorOptions;
@@ -14,9 +18,14 @@ public class KafkaProducerService : BackgroundService
     private readonly IKafkaProducerFactory _producerFactory;
     private readonly ILogger<KafkaProducerService> _logger;
     private readonly JsonSerializerOptions _jsonOptions;
+    private readonly string _bootstrapServers;
 
+    /// <summary>
+    /// Initializes the producer service with configuration and dependencies
+    /// </summary>
     public KafkaProducerService(
         IOptions<GeneratorOptions> generatorOptions,
+        IOptions<KafkaOptions> kafkaOptions,
         ContractGenerator contractGenerator,
         IKafkaProducerFactory producerFactory,
         ILogger<KafkaProducerService> logger)
@@ -25,6 +34,7 @@ public class KafkaProducerService : BackgroundService
         _contractGenerator = contractGenerator;
         _producerFactory = producerFactory;
         _logger = logger;
+        _bootstrapServers = kafkaOptions.Value.BootstrapServers;
 
         _jsonOptions = new JsonSerializerOptions
         {
@@ -33,6 +43,22 @@ public class KafkaProducerService : BackgroundService
         };
     }
 
+    /// <summary>
+    /// Gets the Kafka bootstrap servers from environment variable or configuration
+    /// </summary>
+    /// <returns>Bootstrap servers connection string</returns>
+    private string GetBootstrapServers()
+    {
+        var connectionString = Environment.GetEnvironmentVariable("ConnectionStrings__kafka");
+        if (!string.IsNullOrEmpty(connectionString))
+            return connectionString;
+
+        return _bootstrapServers;
+    }
+
+    /// <summary>
+    /// Main execution method that generates and publishes data to Kafka
+    /// </summary>
     protected override async Task ExecuteAsync(CancellationToken stoppingToken)
     {
         _logger.LogInformation("Starting Kafka Producer Service");
@@ -45,7 +71,13 @@ public class KafkaProducerService : BackgroundService
             return;
         }
 
+        await CreateTopicIfNotExistsAsync(stoppingToken);
+
         var producer = _producerFactory.CreateProducer();
+
+        await Task.Delay(2000, stoppingToken);
+
+        _logger.LogInformation("Starting message generation...");
 
         while (!stoppingToken.IsCancellationRequested)
         {
@@ -82,6 +114,77 @@ public class KafkaProducerService : BackgroundService
         _logger.LogInformation("Kafka Producer Service stopped");
     }
 
+    /// <summary>
+    /// Creates the Kafka topic if it doesn't already exist
+    /// </summary>
+    private async Task CreateTopicIfNotExistsAsync(CancellationToken cancellationToken)
+    {
+        try
+        {
+            _logger.LogInformation("Checking if topic '{Topic}' exists...", _generatorOptions.Topic);
+
+            var bootstrapServers = GetBootstrapServers();
+
+            _logger.LogInformation($"Using Kafka at: {bootstrapServers}");
+
+            using var adminClient = new AdminClientBuilder(new AdminClientConfig
+            {
+                BootstrapServers = bootstrapServers,
+                ApiVersionRequest = false,
+                BrokerVersionFallback = "0.10.0.0",
+                SecurityProtocol = SecurityProtocol.Plaintext
+            }).Build();
+
+            try
+            {
+                var metadata = adminClient.GetMetadata(TimeSpan.FromSeconds(10));
+                var topicExists = metadata.Topics.Any(t => t.Topic == _generatorOptions.Topic && !t.Error.IsError);
+
+                if (topicExists)
+                {
+                    _logger.LogInformation("Topic '{Topic}' already exists", _generatorOptions.Topic);
+                    return;
+                }
+            }
+            catch (KafkaException)
+            {
+
+            }
+
+            _logger.LogInformation("Creating topic '{Topic}'...", _generatorOptions.Topic);
+
+            try
+            {
+                await adminClient.CreateTopicsAsync(new[]
+                {
+                    new TopicSpecification
+                    {
+                        Name = _generatorOptions.Topic,
+                        NumPartitions = 1,
+                        ReplicationFactor = 1
+                    }
+                });
+
+                _logger.LogInformation("Topic '{Topic}' created successfully", _generatorOptions.Topic);
+
+                await Task.Delay(3000, cancellationToken);
+            }
+            catch (CreateTopicsException ex) when (ex.Results[0].Error.Code == ErrorCode.TopicAlreadyExists)
+            {
+                _logger.LogInformation("Topic '{Topic}' already exists", _generatorOptions.Topic);
+            }
+        }
+        catch (Exception ex)
+        {
+            _logger.LogWarning(ex, "Error checking/creating topic. Will try to continue...");
+        }
+    }
+
+    /// <summary>
+    /// Creates a Kafka message from a contract object
+    /// </summary>
+    /// <param name="contract">The contract object to serialize</param>
+    /// <returns>Kafka message or null if serialization fails</returns>
     private Message<Null, string>? CreateKafkaMessage(object contract)
     {
         try
@@ -89,7 +192,6 @@ public class KafkaProducerService : BackgroundService
             var json = JsonSerializer.Serialize(contract, contract.GetType(), _jsonOptions);
             var message = new Message<Null, string> { Value = json };
 
-            // Добавляем метаданные в headers для определения типа контракта
             message.Headers = new Headers
             {
                 new Header("contract-type", System.Text.Encoding.UTF8.GetBytes(contract.GetType().Name))
@@ -104,6 +206,9 @@ public class KafkaProducerService : BackgroundService
         }
     }
 
+    /// <summary>
+    /// Publishes a message to Kafka topic
+    /// </summary>
     private async Task ProduceMessageAsync(
         IProducer<Null, string> producer,
         Message<Null, string> message,

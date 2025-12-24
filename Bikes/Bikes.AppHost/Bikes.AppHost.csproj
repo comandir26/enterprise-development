@@ -20,6 +20,9 @@
 		<ProjectReference Include="..\Bikes.Api.Host\Bikes.Api.Host.csproj"
 						  IsAspireProjectResource="true"
 						  AspireMetadata="AppHost" />
+		<ProjectReference Include="..\Bikes.Generator\Bikes.Generator.csproj"
+					      IsAspireProjectResource="true"
+						  AspireMetadata="AppHost" />
 	</ItemGroup>
 
 </Project>

@@ -4,6 +4,9 @@ using Bogus;
 
 namespace Bikes.Generator;
 
+/// <summary>
+/// Generates fake data for various entities using Bogus library
+/// </summary>
 public class ContractGenerator
 {
     private readonly Faker<BikeCreateUpdateDto> _bikeFaker;
@@ -11,6 +14,9 @@ public class ContractGenerator
     private readonly Faker<RenterCreateUpdateDto> _renterFaker;
     private readonly Faker<RentCreateUpdateDto> _rentFaker;
 
+    /// <summary>
+    /// Initializes the generator with fake data rules for all entity types
+    /// </summary>
     public ContractGenerator()
     {
         _bikeFaker = new Faker<BikeCreateUpdateDto>()
@@ -50,11 +56,35 @@ public class ContractGenerator
             });
     }
 
+    /// <summary>
+    /// Generates a fake bike DTO with random data
+    /// </summary>
+    /// <returns>Generated bike DTO</returns>
     public BikeCreateUpdateDto GenerateBike() => _bikeFaker.Generate();
+
+    /// <summary>
+    /// Generates a fake bike model DTO with random data
+    /// </summary>
+    /// <returns>Generated bike model DTO</returns>
     public BikeModelCreateUpdateDto GenerateBikeModel() => _bikeModelFaker.Generate();
+
+    /// <summary>
+    /// Generates a fake renter DTO with random data
+    /// </summary>
+    /// <returns>Generated renter DTO</returns>
     public RenterCreateUpdateDto GenerateRenter() => _renterFaker.Generate();
+
+    /// <summary>
+    /// Generates a fake rent DTO with random data
+    /// </summary>
+    /// <returns>Generated rent DTO</returns>
     public RentCreateUpdateDto GenerateRent() => _rentFaker.Generate();
 
+    /// <summary>
+    /// Generates a batch of random entities
+    /// </summary>
+    /// <param name="size">Number of entities to generate</param>
+    /// <returns>List of generated entity DTOs</returns>
     public List<object> GenerateBatch(int size)
     {
         var batch = new List<object>();
