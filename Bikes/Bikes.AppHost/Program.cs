@@ -7,11 +7,14 @@ var kafka = builder.AddKafka("kafka")
 var mongodb = builder.AddMongoDB("mongodb")
     .WithDataVolume();
 
-var api = builder.AddProject<Projects.Bikes_Api_Host>("bikes-api")
+var _ = builder.AddProject<Projects.Bikes_Api_Host>("bikes-api")
     .WithReference(mongodb)
-    .WithReference(kafka);
+    .WaitFor(mongodb)
+    .WithReference(kafka)
+    .WaitFor(kafka);
 
-var generator = builder.AddProject<Projects.Bikes_Generator>("bikes-generator")
-    .WithReference(kafka);
+var _2 = builder.AddProject<Projects.Bikes_Generator>("bikes-generator")
+    .WithReference(kafka)
+    .WaitFor(kafka);
 
 builder.Build().Run();

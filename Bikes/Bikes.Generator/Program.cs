@@ -1,29 +1,25 @@
 ﻿using Bikes.Generator;
-using Bikes.Generator.Options; 
+using Bikes.Generator.Options;
+using Bikes.ServiceDefaults;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-using Microsoft.Extensions.Logging;
 
-var host = Host.CreateDefaultBuilder(args)
-    .ConfigureServices((context, services) =>
-    {
-        services.Configure<GeneratorOptions>(
-            context.Configuration.GetSection("Generator"));
-        services.Configure<KafkaOptions>(
-            context.Configuration.GetSection("Kafka"));
+var builder = Host.CreateApplicationBuilder(args);
 
-        services.AddSingleton<ContractGenerator>();
-        services.AddSingleton<IKafkaProducerFactory, KafkaProducerFactory>();
+builder.AddServiceDefaults();
 
-        services.AddSingleton<KafkaProducerService>();
-        services.AddHostedService(provider => provider.GetRequiredService<KafkaProducerService>());
+builder.Services.Configure<GeneratorOptions>(
+    builder.Configuration.GetSection("Generator"));
+builder.Services.Configure<KafkaOptions>(
+    builder.Configuration.GetSection("Kafka"));
 
-        services.AddLogging(builder =>
-        {
-            builder.AddConsole();
-            builder.SetMinimumLevel(LogLevel.Information);
-        });
-    })
-    .Build();
+builder.Services.AddSingleton<ContractGenerator>();
+builder.Services.AddSingleton<IKafkaProducerFactory, KafkaProducerFactory>();
+builder.Services.AddSingleton<KafkaProducerService>();
+
+builder.Services.AddHostedService(provider =>
+    provider.GetRequiredService<KafkaProducerService>());
+
+var host = builder.Build();
 
 await host.RunAsync();

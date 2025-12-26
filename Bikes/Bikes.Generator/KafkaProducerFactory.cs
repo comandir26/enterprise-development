@@ -8,22 +8,12 @@ namespace Bikes.Generator;
 /// <summary>
 /// Factory implementation for creating and managing Kafka producer instances
 /// </summary>
-public class KafkaProducerFactory : IKafkaProducerFactory, IDisposable
+public class KafkaProducerFactory(
+    IOptions<KafkaOptions> options,
+    ILogger<KafkaProducerFactory> logger) : IKafkaProducerFactory, IDisposable
 {
-    private readonly KafkaOptions _options;
-    private readonly ILogger<KafkaProducerFactory> _logger;
+    private readonly KafkaOptions _options = options.Value;
     private IProducer<Null, string>? _producer;
-
-    /// <summary>
-    /// Initializes the factory with Kafka options and logger
-    /// </summary>
-    public KafkaProducerFactory(
-        IOptions<KafkaOptions> options,
-        ILogger<KafkaProducerFactory> logger)
-    {
-        _options = options.Value;
-        _logger = logger;
-    }
 
     /// <summary>
     /// Gets the Kafka bootstrap servers from environment variable or configuration
@@ -79,12 +69,12 @@ public class KafkaProducerFactory : IKafkaProducerFactory, IDisposable
             {
                 _producer = new ProducerBuilder<Null, string>(config)
                     .SetLogHandler((_, message) =>
-                        _logger.LogInformation("Kafka: {Facility} - {Message}", message.Facility, message.Message))
+                        logger.LogInformation("Kafka: {Facility} - {Message}", message.Facility, message.Message))
                     .SetErrorHandler((_, error) =>
-                        _logger.LogError("Kafka Error: {Reason} (Code: {Code})", error.Reason, error.Code))
+                        logger.LogError("Kafka Error: {Reason} (Code: {Code})", error.Reason, error.Code))
                     .Build();
 
-                _logger.LogInformation("Kafka producer connected successfully to {BootstrapServers}",
+                logger.LogInformation("Kafka producer connected successfully to {BootstrapServers}",
                     bootstrapServers);
 
                 return _producer;
@@ -92,13 +82,13 @@ public class KafkaProducerFactory : IKafkaProducerFactory, IDisposable
             catch (Exception ex)
             {
                 retryCount++;
-                _logger.LogWarning(ex,
+                logger.LogWarning(ex,
                     "Failed to connect to Kafka (attempt {RetryCount}/{MaxRetries}). Retrying in {DelayMs}ms...",
                     retryCount, _options.MaxRetryAttempts, _options.RetryDelayMs);
 
                 if (retryCount >= _options.MaxRetryAttempts)
                 {
-                    _logger.LogError(ex, "Max retry attempts reached. Failed to connect to Kafka.");
+                    logger.LogError(ex, "Max retry attempts reached. Failed to connect to Kafka.");
                     throw;
                 }
 
@@ -114,7 +104,22 @@ public class KafkaProducerFactory : IKafkaProducerFactory, IDisposable
     /// </summary>
     public void Dispose()
     {
-        _producer?.Dispose();
-        _producer = null;
+        try
+        {
+            if (_producer != null)
+            {
+                _producer.Flush(TimeSpan.FromSeconds(5));
+                _producer.Dispose();
+                _producer = null;
+            }
+        }
+        catch (Exception ex)
+        {
+            logger?.LogError(ex, "Error while disposing Kafka producer");
+        }
+        finally
+        {
+            GC.SuppressFinalize(this);
+        }
     }
 }

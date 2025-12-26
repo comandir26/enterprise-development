@@ -3,107 +3,95 @@ using Bikes.Contracts.Dto;
 using Confluent.Kafka;
 using Microsoft.Extensions.Options;
 using System.Text.Json;
+using static Confluent.Kafka.ConfigPropertyNames;
 
 namespace Bikes.Api.Host.Kafka;
 
 /// <summary>
 /// Background service for consuming Kafka messages and processing contract DTOs
 /// </summary>
-public class KafkaConsumer : BackgroundService
+public class KafkaConsumer(
+    IConsumer<Ignore, string> consumer,
+    IServiceScopeFactory scopeFactory,
+    IOptions<KafkaConsumerOptions> options,
+    ILogger<KafkaConsumer> logger) : BackgroundService
 {
-    private readonly IConsumer<Ignore, string> _consumer;
-    private readonly IServiceScopeFactory _scopeFactory;
-    private readonly ILogger<KafkaConsumer> _logger;
-    private readonly KafkaConsumerOptions _options;
-    private readonly JsonSerializerOptions _jsonOptions;
-
-    /// <summary>
-    /// Initializes the Kafka consumer with configuration and dependencies
-    /// </summary>
-    public KafkaConsumer(
-        IConsumer<Ignore, string> consumer,
-        IServiceScopeFactory scopeFactory,
-        IOptions<KafkaConsumerOptions> options,
-        ILogger<KafkaConsumer> logger)
+    private readonly KafkaConsumerOptions _options = options.Value;
+    private readonly JsonSerializerOptions _jsonOptions = new()
     {
-        _consumer = consumer;
-        _scopeFactory = scopeFactory;
-        _logger = logger;
-        _options = options.Value;
-
-        _jsonOptions = new JsonSerializerOptions
-        {
-            PropertyNameCaseInsensitive = true,
-            PropertyNamingPolicy = JsonNamingPolicy.CamelCase
-        };
-    }
+        PropertyNameCaseInsensitive = true,
+        PropertyNamingPolicy = JsonNamingPolicy.CamelCase
+    };
 
     /// <summary>
     /// Main execution method that consumes and processes Kafka messages
     /// </summary>
     protected override async Task ExecuteAsync(CancellationToken stoppingToken)
     {
-        _logger.LogInformation("Waiting for application to fully start (20 seconds)...");
-        await Task.Delay(20000, stoppingToken);
-
-        _logger.LogInformation("Starting KafkaConsumer...");
-
-        try
+        _ = Task.Run(async () =>
         {
-            _consumer.Subscribe(_options.Topic);
-            _logger.LogInformation("KafkaConsumer subscribed to topic: {Topic}", _options.Topic);
-        }
-        catch (Exception ex)
-        {
-            _logger.LogError(ex, "Failed to subscribe to Kafka topic");
-            return;
-        }
+            await Task.Delay(5000, stoppingToken);
 
+            logger.LogInformation("Starting KafkaConsumer in background thread...");
 
-        while (!stoppingToken.IsCancellationRequested)
-        {
             try
             {
-                var consumeResult = _consumer.Consume(TimeSpan.FromSeconds(5));
-
-                if (consumeResult == null)
-                {
-                    continue;
-                }
-
-                if (string.IsNullOrEmpty(consumeResult.Message?.Value))
-                {
-                    _logger.LogWarning("Received empty message");
-                    continue;
-                }
-
-                _logger.LogDebug("Processing message at offset {Offset}",
-                    consumeResult.TopicPartitionOffset);
-
-                var contractType = DetermineContractType(consumeResult.Message.Headers);
-                await ProcessMessageAsync(consumeResult.Message.Value, contractType, stoppingToken);
-
-                _consumer.Commit(consumeResult);
-            }
-            catch (ConsumeException ex)
-            {
-                _logger.LogError(ex, "Kafka consumption error: {Error}. Waiting 10 seconds...", ex.Error.Reason);
-                await Task.Delay(10000, stoppingToken);
-            }
-            catch (OperationCanceledException)
-            {
-                _logger.LogInformation("KafkaConsumer is stopping...");
-                break;
+                consumer.Subscribe(_options.Topic);
+                logger.LogInformation("KafkaConsumer subscribed to topic: {Topic}", _options.Topic);
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Unexpected error in KafkaConsumer. Waiting 15 seconds...");
-                await Task.Delay(15000, stoppingToken);
+                logger.LogError(ex, "Failed to subscribe to Kafka topic");
+                return;
             }
-        }
 
-        _consumer.Close();
-        _logger.LogInformation("KafkaConsumer stopped");
+            while (!stoppingToken.IsCancellationRequested)
+            {
+                try
+                {
+                    var consumeResult = consumer.Consume(TimeSpan.FromSeconds(5));
+
+                    if (consumeResult == null)
+                    {
+                        continue;
+                    }
+
+                    if (string.IsNullOrEmpty(consumeResult.Message?.Value))
+                    {
+                        logger.LogWarning("Received empty message");
+                        continue;
+                    }
+
+                    logger.LogDebug("Processing message at offset {Offset}",
+                        consumeResult.TopicPartitionOffset);
+
+                    var contractType = DetermineContractType(consumeResult.Message.Headers);
+                    ProcessMessage(consumeResult.Message.Value, contractType);
+
+                    consumer.Commit(consumeResult);
+                }
+                catch (ConsumeException ex)
+                {
+                    logger.LogError(ex, "Kafka consumption error: {Error}. Waiting 10 seconds...", ex.Error.Reason);
+                    await Task.Delay(10000, stoppingToken);
+                }
+                catch (OperationCanceledException)
+                {
+                    logger.LogInformation("KafkaConsumer is stopping...");
+                    break;
+                }
+                catch (Exception ex)
+                {
+                    logger.LogError(ex, "Unexpected error in KafkaConsumer. Waiting 15 seconds...");
+                    await Task.Delay(15000, stoppingToken);
+                }
+            }
+
+            consumer.Close();
+            logger.LogInformation("KafkaConsumer stopped");
+        }, stoppingToken);
+
+        await Task.CompletedTask;
     }
 
     /// <summary>
@@ -111,7 +99,7 @@ public class KafkaConsumer : BackgroundService
     /// </summary>
     /// <param name="headers">Kafka message headers</param>
     /// <returns>Contract type name or null if not found</returns>
-    private string? DetermineContractType(Headers headers)
+    private static string? DetermineContractType(Headers headers)
     {
         if (headers == null) return null;
 
@@ -129,9 +117,9 @@ public class KafkaConsumer : BackgroundService
     /// </summary>
     /// <param name="messageJson">JSON message content</param>
     /// <param name="contractType">Type of contract to process</param>
-    private async Task ProcessMessageAsync(string messageJson, string? contractType, CancellationToken cancellationToken)
+    private void ProcessMessage(string messageJson, string? contractType)
     {
-        using var scope = _scopeFactory.CreateScope();
+        using var scope = scopeFactory.CreateScope();
 
         try
         {
@@ -143,7 +131,7 @@ public class KafkaConsumer : BackgroundService
                     {
                         var bikeService = scope.ServiceProvider.GetRequiredService<IBikeService>();
                         var result = bikeService.CreateBike(bikeDto);
-                        _logger.LogInformation("Created bike with ID: {BikeId}", result?.Id);
+                        logger.LogInformation("Created bike with ID: {BikeId}", result?.Id);
                     }
                     break;
 
@@ -153,7 +141,7 @@ public class KafkaConsumer : BackgroundService
                     {
                         var bikeModelService = scope.ServiceProvider.GetRequiredService<IBikeModelService>();
                         var result = bikeModelService.CreateBikeModel(bikeModelDto);
-                        _logger.LogInformation("Created bike model with ID: {ModelId}", result?.Id);
+                        logger.LogInformation("Created bike model with ID: {ModelId}", result?.Id);
                     }
                     break;
 
@@ -163,7 +151,7 @@ public class KafkaConsumer : BackgroundService
                     {
                         var renterService = scope.ServiceProvider.GetRequiredService<IRenterService>();
                         var result = renterService.CreateRenter(renterDto);
-                        _logger.LogInformation("Created renter with ID: {RenterId}", result?.Id);
+                        logger.LogInformation("Created renter with ID: {RenterId}", result?.Id);
                     }
                     break;
 
@@ -173,33 +161,33 @@ public class KafkaConsumer : BackgroundService
                     {
                         var rentService = scope.ServiceProvider.GetRequiredService<IRentService>();
                         var result = rentService.CreateRent(rentDto);
-                        _logger.LogInformation("Created rent with ID: {RentId}", result?.Id);
+                        logger.LogInformation("Created rent with ID: {RentId}", result?.Id);
                     }
                     break;
 
                 default:
-                    await TryAutoDetectAndProcessAsync(messageJson, scope, cancellationToken);
+                    TryAutoDetectAndProcess(messageJson, scope);
                     break;
             }
         }
         catch (JsonException ex)
         {
-            _logger.LogError(ex, "Failed to deserialize message: {Message}", messageJson);
+            logger.LogError(ex, "Failed to deserialize message: {Message}", messageJson);
         }
         catch (ArgumentException ex)
         {
-            _logger.LogWarning("Validation error: {ErrorMessage}", ex.Message);
+            logger.LogWarning("Validation error: {ErrorMessage}", ex.Message);
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "Error processing message");
+            logger.LogError(ex, "Error processing message");
         }
     }
 
     /// <summary>
     /// Attempts to auto-detect contract type from JSON structure and process accordingly
     /// </summary>
-    private async Task TryAutoDetectAndProcessAsync(string messageJson, IServiceScope scope, CancellationToken cancellationToken)
+    private void TryAutoDetectAndProcess(string messageJson, IServiceScope scope)
     {
         try
         {
@@ -241,12 +229,12 @@ public class KafkaConsumer : BackgroundService
             }
             else
             {
-                _logger.LogWarning("Could not determine contract type for message: {Message}", messageJson);
+                logger.LogWarning("Could not determine contract type for message: {Message}", messageJson);
             }
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "Failed to auto-detect and process message");
+            logger.LogError(ex, "Failed to auto-detect and process message");
         }
     }
 
@@ -255,7 +243,23 @@ public class KafkaConsumer : BackgroundService
     /// </summary>
     public override void Dispose()
     {
-        _consumer?.Dispose();
-        base.Dispose();
+        try
+        {
+            if (consumer != null)
+            {
+                consumer.Close();
+                consumer.Dispose();
+            }
+        }
+        catch (Exception ex)
+        {
+            logger?.LogError(ex, "Error while disposing Kafka consumer");
+        }
+        finally
+        {
+            base.Dispose();
+
+            GC.SuppressFinalize(this);
+        }
     }
 }

@@ -33,7 +33,7 @@ public static class KafkaConsumerExtensions
                 }
             });
 
-        services.AddSingleton<IConsumer<Ignore, string>>(provider =>
+        services.AddSingleton(provider =>
         {
             var options = provider.GetRequiredService<IOptions<KafkaConsumerOptions>>().Value;
             var logger = provider.GetRequiredService<ILogger<KafkaConsumer>>();

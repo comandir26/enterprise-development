@@ -12,12 +12,13 @@
 		<PackageReference Include="Bogus" Version="35.6.0" />
 		<PackageReference Include="Microsoft.Extensions.Hosting" Version="8.0.0" />
 		<PackageReference Include="Microsoft.Extensions.Configuration.Json" Version="8.0.0" />
-		<PackageReference Include="Microsoft.Extensions.Options" Version="8.0.0" />
+		<PackageReference Include="Microsoft.Extensions.Options" Version="8.0.2" />
 		<PackageReference Include="Microsoft.Extensions.Logging.Console" Version="8.0.0" />
 	</ItemGroup>
 
 	<ItemGroup>
 		<ProjectReference Include="..\Bikes.Contracts\Bikes.Contracts.csproj" />
+		<ProjectReference Include="..\Bikes.ServiceDefaults\Bikes.ServiceDefaults.csproj" />
 	</ItemGroup>
 
 	<ItemGroup>

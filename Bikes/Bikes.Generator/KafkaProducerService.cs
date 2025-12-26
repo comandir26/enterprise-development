@@ -11,37 +11,20 @@ namespace Bikes.Generator;
 /// <summary>
 /// Background service for generating and publishing fake data to Kafka
 /// </summary>
-public class KafkaProducerService : BackgroundService
+public class KafkaProducerService(
+    IOptions<GeneratorOptions> generatorOptions,
+    IOptions<KafkaOptions> kafkaOptions,
+    ContractGenerator contractGenerator,
+    IKafkaProducerFactory producerFactory,
+    ILogger<KafkaProducerService> logger) : BackgroundService
 {
-    private readonly GeneratorOptions _generatorOptions;
-    private readonly ContractGenerator _contractGenerator;
-    private readonly IKafkaProducerFactory _producerFactory;
-    private readonly ILogger<KafkaProducerService> _logger;
-    private readonly JsonSerializerOptions _jsonOptions;
-    private readonly string _bootstrapServers;
-
-    /// <summary>
-    /// Initializes the producer service with configuration and dependencies
-    /// </summary>
-    public KafkaProducerService(
-        IOptions<GeneratorOptions> generatorOptions,
-        IOptions<KafkaOptions> kafkaOptions,
-        ContractGenerator contractGenerator,
-        IKafkaProducerFactory producerFactory,
-        ILogger<KafkaProducerService> logger)
+    private readonly GeneratorOptions _generatorOptions = generatorOptions.Value;
+    private readonly string _bootstrapServers = kafkaOptions.Value.BootstrapServers;
+    private readonly JsonSerializerOptions _jsonOptions = new()
     {
-        _generatorOptions = generatorOptions.Value;
-        _contractGenerator = contractGenerator;
-        _producerFactory = producerFactory;
-        _logger = logger;
-        _bootstrapServers = kafkaOptions.Value.BootstrapServers;
-
-        _jsonOptions = new JsonSerializerOptions
-        {
-            PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
-            WriteIndented = false
-        };
-    }
+        PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
+        WriteIndented = false
+    };
 
     /// <summary>
     /// Gets the Kafka bootstrap servers from environment variable or configuration
@@ -61,29 +44,29 @@ public class KafkaProducerService : BackgroundService
     /// </summary>
     protected override async Task ExecuteAsync(CancellationToken stoppingToken)
     {
-        _logger.LogInformation("Starting Kafka Producer Service");
-        _logger.LogInformation("Configuration: Interval={IntervalMs}ms, BatchSize={BatchSize}, Topic={Topic}",
+        logger.LogInformation("Starting Kafka Producer Service");
+        logger.LogInformation("Configuration: Interval={IntervalMs}ms, BatchSize={BatchSize}, Topic={Topic}",
             _generatorOptions.IntervalMs, _generatorOptions.BatchSize, _generatorOptions.Topic);
 
         if (!_generatorOptions.Enabled)
         {
-            _logger.LogInformation("Generator is disabled. Service will not produce messages.");
+            logger.LogInformation("Generator is disabled. Service will not produce messages.");
             return;
         }
 
         await CreateTopicIfNotExistsAsync(stoppingToken);
 
-        var producer = _producerFactory.CreateProducer();
+        var producer = producerFactory.CreateProducer();
 
         await Task.Delay(2000, stoppingToken);
 
-        _logger.LogInformation("Starting message generation...");
+        logger.LogInformation("Starting message generation...");
 
         while (!stoppingToken.IsCancellationRequested)
         {
             try
             {
-                var batch = _contractGenerator.GenerateBatch(_generatorOptions.BatchSize);
+                var batch = contractGenerator.GenerateBatch(_generatorOptions.BatchSize);
 
                 foreach (var contract in batch)
                 {
@@ -94,24 +77,24 @@ public class KafkaProducerService : BackgroundService
                     }
                 }
 
-                _logger.LogDebug("Generated and sent batch of {Count} messages", batch.Count);
+                logger.LogDebug("Generated and sent batch of {Count} messages", batch.Count);
 
                 await Task.Delay(_generatorOptions.IntervalMs, stoppingToken);
             }
             catch (OperationCanceledException)
             {
-                _logger.LogInformation("Producer service is stopping...");
+                logger.LogInformation("Producer service is stopping...");
                 break;
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error in producer service");
+                logger.LogError(ex, "Error in producer service");
                 await Task.Delay(5000, stoppingToken);
             }
         }
 
         producer.Flush(stoppingToken);
-        _logger.LogInformation("Kafka Producer Service stopped");
+        logger.LogInformation("Kafka Producer Service stopped");
     }
 
     /// <summary>
@@ -121,11 +104,11 @@ public class KafkaProducerService : BackgroundService
     {
         try
         {
-            _logger.LogInformation("Checking if topic '{Topic}' exists...", _generatorOptions.Topic);
+            logger.LogInformation("Checking if topic '{Topic}' exists...", _generatorOptions.Topic);
 
             var bootstrapServers = GetBootstrapServers();
 
-            _logger.LogInformation($"Using Kafka at: {bootstrapServers}");
+            logger.LogInformation("Using Kafka at: {BootstrapServers}", bootstrapServers);
 
             using var adminClient = new AdminClientBuilder(new AdminClientConfig
             {
@@ -142,41 +125,41 @@ public class KafkaProducerService : BackgroundService
 
                 if (topicExists)
                 {
-                    _logger.LogInformation("Topic '{Topic}' already exists", _generatorOptions.Topic);
+                    logger.LogInformation("Topic '{Topic}' already exists", _generatorOptions.Topic);
                     return;
                 }
             }
-            catch (KafkaException)
+            catch (KafkaException ex)
             {
-
+                logger.LogWarning(ex, "Failed to get Kafka metadata");
             }
 
-            _logger.LogInformation("Creating topic '{Topic}'...", _generatorOptions.Topic);
+            logger.LogInformation("Creating topic '{Topic}'...", _generatorOptions.Topic);
 
             try
             {
-                await adminClient.CreateTopicsAsync(new[]
-                {
-                    new TopicSpecification
+                await adminClient.CreateTopicsAsync(
+                [
+                    new()
                     {
                         Name = _generatorOptions.Topic,
                         NumPartitions = 1,
                         ReplicationFactor = 1
                     }
-                });
+                ]);
 
-                _logger.LogInformation("Topic '{Topic}' created successfully", _generatorOptions.Topic);
+                logger.LogInformation("Topic '{Topic}' created successfully", _generatorOptions.Topic);
 
                 await Task.Delay(3000, cancellationToken);
             }
             catch (CreateTopicsException ex) when (ex.Results[0].Error.Code == ErrorCode.TopicAlreadyExists)
             {
-                _logger.LogInformation("Topic '{Topic}' already exists", _generatorOptions.Topic);
+                logger.LogInformation("Topic '{Topic}' already exists", _generatorOptions.Topic);
             }
         }
         catch (Exception ex)
         {
-            _logger.LogWarning(ex, "Error checking/creating topic. Will try to continue...");
+            logger.LogWarning(ex, "Error checking/creating topic. Will try to continue...");
         }
     }
 
@@ -190,18 +173,18 @@ public class KafkaProducerService : BackgroundService
         try
         {
             var json = JsonSerializer.Serialize(contract, contract.GetType(), _jsonOptions);
-            var message = new Message<Null, string> { Value = json };
-
-            message.Headers = new Headers
+            return new Message<Null, string>
             {
-                new Header("contract-type", System.Text.Encoding.UTF8.GetBytes(contract.GetType().Name))
+                Value = json,
+                Headers =
+                 [
+                     new Header("contract-type", System.Text.Encoding.UTF8.GetBytes(contract.GetType().Name))
+                 ]
             };
-
-            return message;
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "Failed to serialize contract: {ContractType}", contract.GetType().Name);
+            logger.LogError(ex, "Failed to serialize contract: {ContractType}", contract.GetType().Name);
             return null;
         }
     }
@@ -221,14 +204,14 @@ public class KafkaProducerService : BackgroundService
                 message,
                 cancellationToken);
 
-            _logger.LogDebug("Message delivered to {Topic} [{Partition}] @ {Offset}",
+            logger.LogDebug("Message delivered to {Topic} [{Partition}] @ {Offset}",
                 deliveryResult.Topic,
                 deliveryResult.Partition,
                 deliveryResult.Offset);
         }
         catch (ProduceException<Null, string> ex)
         {
-            _logger.LogError(ex, "Failed to deliver message: {Error}", ex.Error.Reason);
+            logger.LogError(ex, "Failed to deliver message: {Error}", ex.Error.Reason);
         }
     }
 }
