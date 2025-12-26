@@ -3,7 +3,6 @@ using Bikes.Contracts.Dto;
 using Confluent.Kafka;
 using Microsoft.Extensions.Options;
 using System.Text.Json;
-using static Confluent.Kafka.ConfigPropertyNames;
 
 namespace Bikes.Api.Host.Kafka;
 
